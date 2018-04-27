@@ -293,7 +293,6 @@ router.post("/twilio", function(req,res){
                     data.lastName = found.lastName;
                     io.emit('chat message', data);
 
-					messageReceived();
 
 					
 
@@ -346,6 +345,9 @@ router.post("/twilio", function(req,res){
 						}
 					});
 				}
+
+				res.writeHead(200, {'Content-Type': 'text/xml'});
+				res.end();
 			}
 		});
 	} else if(req.body.MediaUrl0){
