@@ -755,6 +755,7 @@ router.post("/cart/web-charge", function(req,res){
                                                       console.log('Phone: '+phone);
                                                       console.log(err);
                                                   } else {
+                                                    console.log('sent first text');
                                                       //TODO add message to a message database and add message ID to customer conversation, unwrap in CRM
                                                       created.chat.push({
                                                           message : firstText,
@@ -763,6 +764,7 @@ router.post("/cart/web-charge", function(req,res){
                                                           messageID : message.sid,
                                                           status : 'pending'
                                                       });
+                                                      console.log('added first text to DB');
                                                       created.save();
                                                   }
                                               }); 
@@ -779,6 +781,7 @@ router.post("/cart/web-charge", function(req,res){
                                                       console.log('Phone: '+phone);
                                                       console.log(err);
                                                   } else{
+                                                    console.log('sent second text');
                                                       created.chat.push({
                                                           message : secondText,
                                                           sender : 'Company',
@@ -786,6 +789,7 @@ router.post("/cart/web-charge", function(req,res){
                                                           messageID : message.sid,
                                                           status : 'pending'
                                                       });
+                                                      console.log('added second text to db');
                                                       created.lastInteraction = new Date();
                                                       created.save();
                                                   }
