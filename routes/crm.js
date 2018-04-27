@@ -193,14 +193,14 @@ router.get("/crm-chat", function(req,res){
 
     if(req.query.skip){
 
-      TextCustomer.aggregate(
+      TextCustomer.aggregate([
         {$match:{"phone":req.query.phone}},
         {$unwind : '$chat'},
         {$project : {'chat':1}},
         {$sort : {'chat.timestamp' : -1}},
         {$skip : parseInt(req.query.skip)},
         {$limit : 10},
-        {$sort : {'chat.timestamp' : 1}},
+        {$sort : {'chat.timestamp' : 1}}],
         function(err,chats){
           if(err){
             console.log('CRM ERROR 3');
