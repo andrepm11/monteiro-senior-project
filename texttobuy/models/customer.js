@@ -51,9 +51,7 @@ var textCustomerSchema = new db.Schema({
             country : String
         }
     },
-    status : String,
     orders : [{invoiceNumber : String, completionDate : Date}],
-    source : String,
     customerType : String,
     conversionDate : Date,
     lastInteraction : Date,
@@ -69,33 +67,7 @@ var textCustomerSchema = new db.Schema({
 // textCustomerSchema.index({ firstName:'text',lastName:'text',chat:'text'}, {name: 'My text index', weights: {firstName: 10, lastName: 10, chat:5}});
 textCustomerSchema.index({ firstName:'text',lastName:'text',chat:'text'}, {name: 'My text index', weights: {firstName: 100, lastName: 100, chat:5}});
 
-var flexPlanSchema = new db.Schema({
-    phone : String,
-    firstName : String,
-    lastName : String,
-    items : [{
-        id : String,
-        name : String,
-        quantity : Number,
-        price : Number,
-        initials : String
-    }],
-    totalPrice : Number,
-    nextText : Date,
-    nextOrder : Date,
-    started : Date,
-    status : String,
-    pausedOn : Date,
-    resumedOn : Date,
-    totalValue : Number,
-    totalOrders : Number,
-    orders : [String],
-    timesSkipped : Number,
-    timesRushed : Number,
-    timesPaused : Number,
-    timesResumed : Number
 
-});
 
 var textOrderSchema = new db.Schema({
     firstName : String,
@@ -115,72 +87,16 @@ var textOrderSchema = new db.Schema({
             subscriptionId : String
         }
     ],
-    shipping : {
-        shippingType : String,
-        status : String,
-        tracking : String
-    },
-    orderType : String,
-    school : String,
-    address : {
-        address1 : String,
-        address2 : String,
-        city : String,
-        state : String,
-        zip : String
-    },
     paid : Number,
-    totalBars : Number,
-    pricePerBar : Number,
-    refund : [
-        {
-            amount : Number,
-            reason : String,
-            stripeRefund : String,
-            status : String,
-            refundDate : Date
-        }
-    ],
-    discount : [
-        {
-            code : String,
-            discountType : String,
-            amount : Number
-        }
-    ],
-    source : String
-
+    totalPacks : Number,
+    pricePerPack : Number
 });
 
-var textConversationSchema = new db.Schema({
-    phone : String,
-    slackChannel : String,
-    chat : [
-        {
-            message : String,
-            sender : String,
-            timestamp : Date
-        }
-    ]
-});
 
-var schoolInfoSchema = new db.Schema({
-    inventory : Number,
-    school : String,
-    numberLinksSent : Number,
-    webPurchases : Number,
-    waitForConfirms : Number,
-    confirmPurchases : Number,
-    barsSold : Number,
-    repSlack : String
-});
 
 module.exports = {
     TextCustomer : db.model("TextCustomer", textCustomerSchema),
-    TextConversation : db.model("TextConversation", textConversationSchema),
-    TextOrder : db.model("TextOrder", textOrderSchema),
-    SchoolInfo : db.model("SchoolInfo", schoolInfoSchema),
-    FlexPlan : db.model("FlexPlan", flexPlanSchema)
+    TextOrder : db.model("TextOrder", textOrderSchema)
 };
 
 

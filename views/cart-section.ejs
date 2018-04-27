@@ -1,0 +1,53 @@
+<button type="button" style="width:100%" class="btn btn-link collapsed" id="orderSummaryBtn" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+
+	<div class="row pl-0 pr-0" id="orderSummary">
+		    	<div class="col-7">	
+				      <span id="orderSummaryText" class="mb-0">Show order summary &or;</span>
+				</div>
+				<div class="col-5 text-right">
+					<span class="discounted-total"><% if(discountedTotal){ %>$<%= discountedTotal.toFixed(2) %><% } %></span>
+				</div>
+		    </div>
+	    </button>
+
+<div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+      <div>
+		<div class="row">
+			<div class="offset-1 col-10">
+				<div class="row" style="font-size:0.9em; font-weight:bold; border-bottom: 1px solid lightgray;">
+					<div class="col-6 pl-0 text-left cart-header"><h5>Items</h5></div>
+					<div class="col-4 text-center cart-header"><h5>Quantity</h5></div>
+					<div class="col-2 text-right cart-header"><h5>Total</h5></div>
+				</div>
+			</div>
+		</div>
+		<% if(items) { %>
+		<% items.forEach(function(item, idx){ %>
+			<div class="row cart-product">
+				<div class="offset-1 col-10">
+					<div class="row pt-3 pb-3" style="font-size:0.9em; font-weight:bold; border-bottom: 1px solid lightgray;">
+						<div class="col-6 d-flex justify-content-start align-items-center pl-0">
+							<img id="item-image<%=idx%>" src="<%= item.image %>">
+							<span id="item-name<%=idx%>" class="text-center" style="color:#999; width:50%; font-size:0.9em; font-weight:400;"><%=item.name%></span>
+						</div>
+						<div class="col-4 d-flex justify-content-center align-items-center">
+							<% if(item.id == 'oc-3bar-trial' || item.id == 'oc-3bar-trial-referred'){ %>
+								<div data-id="<%= item.id %>" id="item-id<%=idx%>" class="text-center align-items-center" style="color:#999; font-weight:400;">Trial</div>
+								<button type="button" class="cart-minus trial-cart-minus">x</button>
+							<% } else { %>
+								<button type="button" class="cart-minus">-</button>
+								<div data-id="<%= item.id %>" id="item-id<%=idx%>" class="cart-items-count text-center align-items-center" style="color:#999; font-weight:400;"><%=item.quantity%></div>
+								<button type="button" class="cart-plus">+</button>
+							<% } %>
+						</div>
+
+						<div class="col-2 d-flex justify-content-end align-items-center text-right pr-0">
+							<span id="item-price<%=idx%>" class="text-right" data-price="<%=item.price%>" data-name="<%=item.name%>" style="color:#999; font-weight:400;">$<%= item.price * item.quantity %></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		<% }); %>
+		<% } %>
+      </div>
+    </div>

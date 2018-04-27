@@ -41,7 +41,7 @@
     <script src="https://js.stripe.com/v3/"></script>
 
   
-  <!-- <link rel="stylesheet" href="/css/shop.css"> -->
+  <link rel="stylesheet" href="/css/shop.css">
   <link rel="stylesheet" href="/css/main-1.css">
   <link rel="stylesheet" href="/css/main-style.css">
 </head>
@@ -56,16 +56,16 @@
 	<div class="container-fluid">
 		<div class="row" style="background-color:#F2F4F5;">
 			<div class="col-12">
-				<p class="text-center mb-0 pt-1 pb-1" style="font-size:0.9em;"><i>"Time flies like an arrow; fruit flies like a banana."</i></p>
+				<p class="text-center mb-0 pt-1 pb-1" style="font-size:0.9em;"><i>A senior project in Computer Science by André Monteiro.</i></p>
 			</div>
 		</div>
 	</div>
 
-	<div class="container">
+	<div class="container-fluid">
 
 		<div class="row pt-4 pb-1">
 			<div class="col-12">
-				<h2 class="text-center title"><a href="/">VERB ENERGY</a></h2>
+				<h2 class="text-center title"><a href="/">OH S#!T</a></h2>
 			</div>
 		</div>
 	<% if(items && items[0]){ %>
@@ -146,21 +146,11 @@
 							</div>
 						</div>
 					</div>
-					<!-- <div class="shipping-div" id="shipping-school" style="display:none;">
-						<div class="row pb-2">
-							<p class="col-11" style="font-size:1.3em;">School</p>
-							<div class="offset-1 col-10">
-								<label><input type="radio" name="school" value="Yale" checked="checked">Yale</label>
-								
-							</div>
-						</div>
-					</div> -->
 				</div>
 
 				<h2 class="cart-header col-10 pl-0 pr-0 offset-1 h4 pt-3">Payment Info</h2>
 				<div class="col-10 offset-1 pb-3">
 					<div class="row">
-						<!-- <div class="col-12"> -->
 							<div id="card-errors" class="small text-danger" style="display: inline-block" role="alert">
 								<% if(error){ %>
 									<span><%= error %></span>
@@ -170,19 +160,13 @@
 							</div>
 						<div id="place-order-alert" class="alert-div">
 						</div>
-							<!-- <div id="loading-indicator" class="col-sm-2 offset-sm-4 col-4 offset-2 no-padding" style="display:none">
-						  			<img src="/img/loading_1.gif">
-				      		</div> -->
-			      		<!-- </div> -->
 					</div>
 
 				</div>
 
 				<div class="row mb-5 pb-5 mb-md-0 pb-md-0">
 					<div class="col-10 offset-1 text-center">
-
 						<button id="complete-order" class="btn cart-buttons mb-3"><strong>PLACE ORDER</strong></button>
-						<a href="/#OrderVerb">Continue shopping</a>
 					</div>
 				</div>
 			</div>
@@ -198,7 +182,6 @@
 	  		<div class="col-12">
 	  			<h4 class="cart-header text-center">Please add something to your cart before checking out.</h4>
 	  			<h4 class="cart-header text-center"><a href="/#OrderVerb">Go home</a></h4>
-	  			<h4 class="cart-header text-center"><a href="/trial">Or try Verb</a></h4>
 	  		</div>
 	  	</div>
 	  </div>
@@ -211,55 +194,10 @@
 	  	</div>
 	  	<div class="row">
 	  	<div class="col-12">
-
-	  		<form id="friend-form">
-	  			<div class="col-10 pl-0 pr-0 offset-1 mb-3">
-	  				<h4 class="cart-header text-center mb-3">Want to send 3 bars to a friend on us? Just give us a way to reach out and we'll handle the rest.</h4>
-					<div class="row pb-2">
-						<div class="col-12">
-							<input id="friendemail" type="email" class="form-control" name="email" required placeholder="Friend's E-mail">
-						</div>
-					</div>
-					<div class="row pb-2">
-						<div class="col-sm-6 col-12 pb-lg-0 pb-2">
-							<input autocapitalize="words" id="friendfirstName" name="firstName" class="form-control" type="text" placeholder="Friend's First Name" required>
-						</div>
-						<div class="col-sm-6 col-12 pb-lg-0">
-							<input autocapitalize="words" id="friendlastName" name="lastName" class="form-control" type="text" placeholder="Friend's Last Name" required>
-						</div>
-					</div>
-				</div>
-				<div class="row mb-5 pb-5 mb-md-0 pb-md-0">
-					<div class="col-10 offset-1 text-center">
-						<button class="btn cart-buttons"><strong>SEND IT</strong></button>
-					</div>
-				</div>
-	  		</form>
+	  		<h4 class="cart-header text-center mb-3">Your payment is complete!</h4>
 	  	</div>
 	  	</div>
 	  </div>
-	   <div id="friend-complete" class="mb-5 pb-5" style="display:none;">
-	  	<div class="row mb-3">
-	  		<div class="col-12">
-	  			<h4 class="cart-header text-center">Thanks for sharing Verb!</h4>
-	  			<h4 class="cart-header text-center">Feel free to check us out on <a href="https://www.instagram.com/verbenergy">Instagram: @verbenergy</a></h4>
-	  			<h4 class="cart-header text-center">Or <a href="sms:4159158372">text us</a> if you want to say hi.</h4>
-	  		</div>
-	  	</div>
-	  </div>
-		<div class="row pl-md-5 pr-md-5 cart-footer">
-			<div class="col-7">
-				<p><a href="/">Home Page</a></p>
-				<p><a href="/trial">Trial Page</a></p>
-			</div>
-			<div class="col-3">
-				<p>&copy; 2018 Verb Energy, Inc.</p>
-				<p>All Rights Reserved.</p>
-			</div>
-			<div class="col-2">
-				<img id="footer-logo" style="max-width:100%;" src="/img/verb_logo_500x188px.png" alt="Verb Energy Bars Logo" />
-			</div>
-		</div>
 	</div>
 	<div class="loader" id="loading-indicator" style="display:none;"></div>
 
@@ -268,7 +206,7 @@
     </script>
 
     <% if(items && items[0]){ %>
-		<script src="/js/main-cart-3-3.js"></script>
+		<script src="/js/main-cart.js"></script>
 	<% } %>
 
 </div>

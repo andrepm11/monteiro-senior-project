@@ -1,5 +1,4 @@
 var stripeTestKey = process.env.STRIPETEST; 
-var stripeLiveKey = process.env.STRIPELIVE; 
 
 var express = require("express");
 var router = express.Router();
@@ -9,7 +8,6 @@ var db = require('../db.js');
 
 var models = require("../texttobuy/models/customer.js");
 var TextCustomer = models.TextCustomer;
-var SchoolInfo = models.SchoolInfo;
 var TextOrder = models.TextOrder;
 
 
@@ -17,19 +15,8 @@ var _  = require("underscore");
 
 var sanitize = require('mongo-sanitize');
 
-// var stripe = require("stripe")(stripeTestKey);
-
-// var productInfo = require("../productInfo.js");
-// var codes = productInfo.codes;
-// var pricing = productInfo.price;
-// var productQuant = productInfo.quantity;
-
 var slackPost = require("../slackPost.js");
-var stripe = require("stripe")(stripeLiveKey);
-
-
-// mongoose.Promise = global.Promise;
-// mongoose.connect("mongodb://localhost/verb-webapp",{useMongoClient: true});
+var stripe = require("stripe")(stripeTestKey);
 
 
 var accountSid = process.env.twilioSID;
@@ -45,7 +32,7 @@ router.post("/cart/addtocart", function(req,res){
     name:req.body.name,
     quantity:req.body.quantity,
     image:req.body.image,
-    // price:pricing[req.body.id]
+    price:20
   }
   if(req.session.items){
     var found = false;
@@ -65,11 +52,11 @@ router.post("/cart/addtocart", function(req,res){
       // req.session.totalPrice += req.body.quantity*req.body.price;
     }
     if(!trial){
-      req.session.cartTotal += req.body.quantity*pricing[req.body.id];
+      req.session.cartTotal += req.body.quantity*20
     }
   } else {
     req.session.items = [addItem];
-    req.session.cartTotal = req.body.quantity*pricing[req.body.id];
+    req.session.cartTotal = req.body.quantity*20
   }
   // req.session.items = 0;
   // res.sendStatus(200);
@@ -178,6 +165,7 @@ router.post("/cart/set-session", function(req,res){
 router.post("/validatephone", function(req,res){
   var phone = req.body.phone;
 
+
   req.session['phone'] = phone;
 
 
@@ -201,43 +189,6 @@ router.post("/validatephone", function(req,res){
   });
 });
 
-router.post("/promocode", function(req,res){
-
-  var code = req.body.code;
-  if(req.session['promocode'] && req.session['promocode'][code]){
-    res.send({result:"error", errMessage:'That code has already been applied', alertId:req.body.alert});
-  } else if(codes[code]){
-
-    var codeMatch = false;
-    req.session.items.some(function(item){
-      if(item.id == codes[code][0] || codes[code][0] == 'all'){
-        codeMatch = true;
-        return true;
-      }
-    });
-
-    if(codeMatch){
-      if(req.session['promocode']){
-        req.session['promocode'][code] = codes[code];
-      } else{
-        console.log('here');
-        req.session['promocode'] = {};
-        req.session['promocode'][code] =codes[code];
-      }
-      res.send({result:'success',code:codes[code]});
-      
-    } else {
-      res.send({result:"error", errMessage:'That code doesn\'t apply to any items in your cart', alertId:req.body.alert});
-    }
-
-    // res.send({result:'success',code:codes[code]});
-    // req.session['promocode'] = code;
-  } else {
-    res.send({result:"error", errMessage:'That code doesn\'t exist', alertId:req.body.alert});
-  }
-
-  
-});
 
 
 router.get("/cart", function(req,res){
@@ -246,7 +197,7 @@ router.get("/cart", function(req,res){
 
   var pass = {
     query : req.query,
-    // price : pricing['oc-3bar-trial'],
+    price : 20,
     firstName : req.session.firstName,
     lastName : req.session.lastName,
     email : req.session.email,
@@ -293,7 +244,7 @@ router.get("/cart-section", function(req,res){
 
   var pass = {
     query : req.query,
-    price : pricing['oc-3bar-trial'],
+    price : 20,
     firstName : req.session.firstName,
     lastName : req.session.lastName,
     email : req.session.email,
@@ -314,7 +265,7 @@ router.get("/cart-section", function(req,res){
     simpleNav: false
   };
 
-  res.render("website/partials/cart-section",pass, function(err,html){
+  res.render("cart-section",pass, function(err,html){
     res.send(html);
   });
 
@@ -383,307 +334,131 @@ router.post("/cart/web-charge", function(req,res){
                             var totalQuantity = 0;
                             var totalPrice = 0;
                             req.session.items.forEach(function(item){
-                                totalQuantity += productQuant[item.id]*item.quantity;
-                                totalPrice += pricing[item.id]*item.quantity;
+                                totalQuantity += item.quantity;
+                                totalPrice += 20*item.quantity;
                             });
                             totalQuantity = parseInt(totalQuantity);
 
-                            var discountedPrice = totalPrice;
-                            var discount = [];
-                            //Change this to all discount codes
-                            if(req.session.promocode && Object.keys(req.session.promocode).length){
-                              if(req.session.promocode['SHAREVERB']){
-                                var difference = totalPrice*req.session.promocode['SHAREVERB'][2]/100;
-                                discountedPrice = totalPrice-difference;
-                                discount.push({
-                                  code : 'SHAREVERB',
-                                  discountType : 'percent',
-                                  amount : req.session.promocode['SHAREVERB'][2]
-                                });
-                              }
-                            }
+                            TextOrder.findOne({}, null, {sort:{"invoiceNumber":-1}}, function(err,order){
+                                if(err){
+                                    console.log('ERROR - Could not find order');
+                                    console.log(err);
+                                    res.send({result:'error', error:'Something went wrong. Please refresh the page and try again.'});
+                                    //ERROR
+                                } else {
+                                    if(order){
+                                        var number = parseInt(order.invoiceNumber.substr(3))+1;
+                                        var newOrder = 'OSHT'+number.toString();
+                                    } else {
+                                        var newOrder = 'OSHT1000';
+                                    }
 
-                            if(totalPrice < pricing['oc-box']){
-                              errMessage = 'It seems like you\'ve ordered Verb Bars before. <a href="/#OrderVerb" class="alert-link">Get a box here.</a>';
-                              res.send({result:"error", errMessage:errMessage, alertId:'place-order-alert'});
-                            } else {
-                              TextOrder.findOne({}, null, {sort:{"invoiceNumber":-1}}, function(err,order){
-                                  if(err){
-                                      console.log('ERROR - Could not find order');
-                                      console.log(err);
-                                      res.send({result:'error', error:'Something went wrong. Please refresh the page and try again.'});
-                                      //ERROR
-                                  } else {
-                                      if(order){
-                                          var number = parseInt(order.invoiceNumber.substr(3))+1;
-                                          var newOrder = 'VRB'+number.toString();
-                                      } else {
-                                          var newOrder = 'VRB1000';
-                                      }
+                                    stripe.charges.create({
+                                        amount : Math.round(totalPrice * 100),
+                                        currency : 'usd',
+                                        customer : found.customerId,
+                                        description : (totalQuantity).toString()+" TP Mega Packs",
+                                        receipt_email : req.session.email,
+                                        metadata : {'invoiceNumber':newOrder}
+                                    }, function(err,charge){
+                                        if(err){
+                                            console.log('ERROR - Stripe Charge');
+                                            console.log(err);
+                                            req.session.error = err.message;
+                                            res.send({result:'error',error:err.message});
+                                            //ERROR
+                                        } else {
+                                            var items = req.session.items;
+                                            items.forEach(function(item){
+                                                item.price = 20;
+                                                item.totalPrice = item.quantity*item.price;
+                                            });
 
-                                      stripe.charges.create({
-                                          amount : Math.round(discountedPrice * 100),
-                                          currency : 'usd',
-                                          customer : found.customerId,
-                                          description : (totalQuantity).toString()+" Verb Bars",
-                                          receipt_email : req.session.email,
-                                          metadata : {'invoiceNumber':newOrder}
-                                      }, function(err,charge){
-                                          if(err){
-                                              console.log('ERROR - Stripe Charge');
-                                              console.log(err);
-                                              req.session.error = err.message;
-                                              res.send({result:'error',error:err.message});
-                                              //ERROR
-                                          } else {
-                                              var items = req.session.items;
-                                              items.forEach(function(item){
-                                                  item.price = pricing[item.id];
-                                                  item.totalPrice = item.quantity*item.price;
-                                              });
+                                            var firstName = req.session.firstName;
+                                            var lastName = req.session.lastName;
+                                            var email = req.session.email;
+                                            var phone = req.session.phone;
+                                        
+                                            
+                                            TextOrder.create({
+                                                firstName : req.session.firstName,
+                                                lastName : req.session.lastName,
+                                                email : req.session.email,
+                                                invoiceNumber : newOrder,
+                                                customerPhone : req.session.phone,
+                                                stripeCharge : charge.id,
+                                                items : items,
+                                                totalPacks : totalQuantity,
+                                                pricePerPack : totalPrice / totalQuantity,
+                                                address : {
+                                                    address1 : req.session.address1,
+                                                    address2 : req.session.address2,
+                                                    city : req.session.city,
+                                                    state : req.session.state,
+                                                    zip : req.session.zip
+                                                },
+                                                completionDate : new Date(),
+                                                paid : charge.amount / 100
+                                            }, function(err,order){
+                                                if(err){
+                                                    console.log('ERROR - Creating order');
+                                                    console.log('Customer: '+firstName+' '+lastName);
+                                                    console.log('Email: '+email);
+                                                    console.log(err);
+                                                    res.send({result:'error',error:'Something went wrong. Please refresh and try again in a minute.'});
+                                                } else {
+                                                    console.log('----- Order created -----');
+                                                    console.log('Invoice: '+newOrder);
+                                                    console.log('Customer: '+firstName+' '+lastName);
+                                                    console.log('Phone: '+phone);
+                                                    res.send({result:'success'});
+                                                }
+                                            });
 
-                                              var channel = 'ground shipping';
+                                            found.firstName = req.session.firstName;
+                                            found.lastName = req.session.lastName;
+                                            found.email = req.session.email;
+                                            found.totalOrders += 1;
+                                            found.totalValue += charge.amount / 100;
+                                            found.orders.push({'invoiceNumber':newOrder});
+                                            found.card = {
+                                                last4 : charge.source.last4,
+                                                brand : charge.source.brand,
+                                                exp_month : charge.source.exp_month,
+                                                exp_year : charge.source.exp_year
+                                            };
 
-                                              var firstName = req.session.firstName;
-                                              var lastName = req.session.lastName;
-                                              var email = req.session.email;
-                                              var phone = req.session.phone;
-                                              var source = req.session.src;
-                                              if(!source){
-                                                source = 'none';
-                                              }
+                                            //Change this to order confirmation and reorder. Line 335 on twilio.js
+                                            // var message = 'Your order of Verb Bars has been completed! You\'ll get another text as soon as your order ships. For future orders, you won\'t need to re-enter your credit card information and can just text this number to reorder.';
+                                            var messageBody = 'Your order has been completed! Just text us if you ever want more toilet paper.';
 
-                                              //Klaviyo Order
-
-
-
-
-                                              klaviyoPlacedOrder(req.session.email);
-
-                                              if(totalPrice >= pricing['oc-box']){
-                                                customerType(req.session.email, 'Full');
-                                              } else {
-                                                customerType(req.session.email, 'Trial');
-                                              }
-
-
-
-                                          
-                                              if(req.session.shipping == 'campus'){
-                                                  TextOrder.create({
-                                                      firstName : req.session.firstName,
-                                                      lastName : req.session.lastName,
-                                                      email : req.session.email,
-                                                      invoiceNumber : newOrder,
-                                                      customerPhone : req.session.phone,
-                                                      stripeCharge : charge.id,
-                                                      items : items,
-                                                      totalBars : totalQuantity,
-                                                      pricePerBar : discountedPrice / totalQuantity,
-                                                      shipping : {
-                                                          shippingType : req.session.shipping,
-                                                          status : 'Pending'
-                                                      },
-                                                      orderType : 'Web',
-                                                      school : req.session.school,
-                                                      completionDate : new Date(),
-                                                      paid : charge.amount / 100,
-                                                      source : source
-                                                  }, function(err,order){
-                                                      if(err){
-                                                          console.log('ERROR - Creating order');
-                                                          console.log('Customer: '+firstName+' '+lastName);
-                                                          console.log('Email: '+email);
-                                                          console.log(err);
-                                                          res.send({result:'error',error:'Something went wrong. Please refresh and try again in a minute.'});
-                                                      } else {
-                                                          console.log('----- Order created -----');
-                                                          console.log('Invoice: '+newOrder);
-                                                          console.log('Customer: '+firstName+' '+lastName);
-                                                          console.log('Phone: '+phone);
-                                                          res.send({result:'success'});
-                                                      }
-                                                  });
-
-                                                  SchoolInfo.findOne({"school":req.session.school}, function(err,info){
-                                                      if(err){
-                                                          console.log('ERROR - find school');
-                                                          console.log('School: '+req.session.school);
-                                                          console.log(err);
-                                                          // No school?
-                                                      } else{
-                                                          if(info){
-                                                              info.inventory-=charge.amount/(1.8*100);
-                                                              info.webPurchases+=1;
-                                                              info.numberLinksSent+=1;
-                                                              info.barsSold+=charge.amount/(1.8*100);
-                                                              info.save();
-
-                                                              // Non-Yale send message to Reps via Slack. Example below:
-                                                              // if(req.body.school == 'Wesleyan'){
-                                                              //     var message ='New order has come in! Reply "'+newOrder+'" to claim the delivery.';
-                                                              //     var payload = {
-                                                              //         token : process.env.SLACKTOKEN,
-                                                              //         channel : found.repSlack,
-                                                              //         text : message,
-                                                              //         as_user : false,
-                                                              //         username : 'Verb Bot'
-                                                              //     };
-
-                                                              //     slackPost('chat.postMessage', [payload]);
-                                                              // }
-
-                                                          } else {
-                                                              console.log('ERROR - find school');
-                                                              console.log('School: '+req.session.school);
-                                                          }
-                                                      }
-                                                  });
-
-                                                  channel = req.session.school;
-
-                                                  found.school = req.session.school;
-
-                                                  web.groups.rename(found.slackChannel, req.session.school.substr(0,4)+'-'+firstName+'-'+lastName);
-                                              } else {
-                                                  TextOrder.create({
-                                                      firstName : req.session.firstName,
-                                                      lastName : req.session.lastName,
-                                                      email : req.session.email,
-                                                      invoiceNumber : newOrder,
-                                                      customerPhone : req.session.phone,
-                                                      stripeCharge : charge.id,
-                                                      items : items,
-                                                      totalBars : totalQuantity,
-                                                      pricePerBar : discountedPrice / totalQuantity,
-                                                      shipping : {
-                                                          shippingType : req.session.shipping,
-                                                          status : 'Pending'
-                                                      },
-                                                      orderType : 'Web',
-                                                      address : {
-                                                          address1 : req.session.address1,
-                                                          address2 : req.session.address2,
-                                                          city : req.session.city,
-                                                          state : req.session.state,
-                                                          zip : req.session.zip
-                                                      },
-                                                      completionDate : new Date(),
-                                                      paid : charge.amount / 100,
-                                                      source : source
-                                                  }, function(err,order){
-                                                      if(err){
-                                                          console.log('ERROR - Creating order');
-                                                          console.log('Customer: '+firstName+' '+lastName);
-                                                          console.log('Email: '+email);
-                                                          console.log(err);
-                                                          res.send({result:'error',error:'Something went wrong. Please refresh and try again in a minute.'});
-                                                      } else {
-                                                          console.log('----- Order created -----');
-                                                          console.log('Invoice: '+newOrder);
-                                                          console.log('Customer: '+firstName+' '+lastName);
-                                                          console.log('Phone: '+phone);
-                                                          res.send({result:'success'});
-                                                      }
-                                                  });
-
-                                                  found.address = {
-                                                      shippingAddress : {
-                                                          address1 : req.session.address1,
-                                                          address2 : req.session.address2,
-                                                          city : req.session.city,
-                                                          state : req.session.state,
-                                                          zip : req.session.zip
-                                                      }
-                                                  };
-
-                                                  web.groups.rename(found.slackChannel, 'web-'+firstName+'-'+lastName);
-                                              }
-
-                                              found.firstName = req.session.firstName;
-                                              found.lastName = req.session.lastName;
-                                              found.email = req.session.email;
-                                              found.totalOrders += 1;
-                                              found.totalValue += charge.amount / 100;
-                                              found.orders.push({'invoiceNumber':newOrder});
-                                              found.card = {
-                                                  last4 : charge.source.last4,
-                                                  brand : charge.source.brand,
-                                                  exp_month : charge.source.exp_month,
-                                                  exp_year : charge.source.exp_year
-                                              };
-
-
-                                              // if(req.session.shipping == 'campus'){
-                                              //     web.groups.rename(found.slackChannel, req.session.school.substr(0,4)+'-'+found.firstName+'-'+found.lastName);
-                                              // } else {
-                                              //     web.groups.rename(found.slackChannel, 'web-'+found.firstName+'-'+found.lastName);
-                                              // }
-
-
-                                              web.groups.setPurpose(found.slackChannel,found.firstName+' '+found.lastName);
-                                              
-                                              found.status="WEBPURCHASED";
-
-
-                                              //Change this to order confirmation and reorder. Line 335 on twilio.js
-                                              // var message = 'Your order of Verb Bars has been completed! You\'ll get another text as soon as your order ships. For future orders, you won\'t need to re-enter your credit card information and can just text this number to reorder.';
-                                              var messageBody = 'Your order of Verb Bars has been completed! Just text us if you ever want more bars.';
-
-                                              var phone = req.session.phone;
-                                              client.messages.create({
-                                                  body:messageBody,
-                                                  to:phone,
-                                                  from:'+14159158372',
-                                                  statusCallback: 'https://dash.verbenergybar.com/twilioCallBack',
-                                              }, function(err,message){
-                                                  if(err){
-                                                      console.log('ERROR - Sending order confirmation text');
-                                                      console.log('Phone: '+phone);
-                                                      console.log(err);
-                                                  } else{
-                                                      found.chat.push({
-                                                          message : messageBody,
-                                                          sender : 'Verb',
-                                                          timestamp : new Date(),
-                                                          messageID : message.sid,
-                                                          status : 'pending'
-                                                      });
-                                                      found.save();
-                                                  }
-                                              }); 
-
-                                              var payloads = [];
-
-                                              var payload = {
-                                                  token : process.env.SLACKTOKEN,
-                                                  channel : found.slackChannel,
-                                                  text : messageBody,
-                                                  as_user : false,
-                                                  username : 'Verb Bot'
-                                              };
-                                              payloads.push(payload);
-
-                                              // slackPost('chat.postMessage', payloads);
-
-                                              var payload = {
-                                                  token : process.env.SLACKTOKEN,
-                                                  channel : process.env.NOTIFYVERBSLACK,
-                                                  text : 'Order '+newOrder+ ' - '+channel+'. '+found.firstName+' '+found.lastName+'. '+totalQuantity.toString()+' Bars',
-                                                  as_user : false,
-                                                  username : 'Verb Bot'
-                                              };
-                                              payloads.push(payload);
-
-                                              slackPost('chat.postMessage', payloads);
-                                              
-                                              resetSession(req);
-                                              // res.send({result:'success'});
-                                          }
-                                      });
-                                  }
-                              });
-                            }
+                                            var phone = req.session.phone;
+                                            client.messages.create({
+                                                body:messageBody,
+                                                to:phone,
+                                                from:'+17864603490',
+                                                statusCallback: 'https://monteiro-senior-project.herokuapp.com/twilioCallBack',
+                                            }, function(err,message){
+                                                if(err){
+                                                    console.log('ERROR - Sending order confirmation text');
+                                                    console.log('Phone: '+phone);
+                                                    console.log(err);
+                                                } else{
+                                                    found.chat.push({
+                                                        message : messageBody,
+                                                        sender : 'Verb',
+                                                        timestamp : new Date(),
+                                                        messageID : message.sid,
+                                                        status : 'pending'
+                                                    });
+                                                    found.save();
+                                                }
+                                            }); 
+                                            resetSession(req);
+                                        }
+                                    });
+                                }
+                            });
                         }
                     });
                 } else {
@@ -708,25 +483,11 @@ router.post("/cart/web-charge", function(req,res){
                             var totalQuantity = 0;
                             var totalPrice = 0;
                             req.session.items.forEach(function(item){
-                                totalQuantity += productQuant[item.id]*item.quantity;
-                                totalPrice += pricing[item.id]*item.quantity;
+                                totalQuantity += item.quantity;
+                                totalPrice += 20*item.quantity;
                             });
                             totalQuantity = parseInt(totalQuantity);
 
-                            var discountedPrice = totalPrice;
-                            var discount = [];
-                            //Change this to all discount codes
-                            if(req.session.promocode && Object.keys(req.session.promocode).length){
-                              if(req.session.promocode['SHAREVERB']){
-                                var difference = totalPrice*req.session.promocode['SHAREVERB'][2]/100;
-                                discountedPrice = totalPrice-difference;
-                                discount.push({
-                                  code : 'SHAREVERB',
-                                  discountType : 'percent',
-                                  amount : req.session.promocode['SHAREVERB'][2]
-                                });
-                              }
-                            }
 
                             TextOrder.findOne({}, null,{sort:{"invoiceNumber":-1}}, function(err,order){
                                 if(err){
@@ -741,10 +502,10 @@ router.post("/cart/web-charge", function(req,res){
                                         var newOrder = 'VRB1000';
                                     }
                                     stripe.charges.create({
-                                        amount : Math.round(discountedPrice*100),
+                                        amount : Math.round(totalPrice*100),
                                         currency : 'usd',
                                         customer : customer.id,
-                                        description : (totalQuantity).toString()+" Verb Bars",
+                                        description : (totalQuantity).toString()+" TP Mega Packs",
                                         receipt_email : req.session.email,
                                         metadata : {'invoiceNumber' : newOrder}
                                     }, function(err,charge){
@@ -757,7 +518,7 @@ router.post("/cart/web-charge", function(req,res){
 
                                             var items = req.session.items;
                                             items.forEach(function(item){
-                                                item.price = pricing[item.id];
+                                                item.price = 20;
                                                 item.totalPrice = item.quantity*item.price;
                                             });
 
@@ -765,146 +526,37 @@ router.post("/cart/web-charge", function(req,res){
                                             var lastName = req.session.lastName;
                                             var email = req.session.email;
                                             var phone = req.session.phone;
-                                            var source = req.session.src;
-                                            if(!source){
-                                              source = 'none';
-                                            }
+                                            
+                                            
+                                            TextOrder.create({
+                                                firstName : req.session.firstName,
+                                                lastName : req.session.lastName,
+                                                email : req.session.email,
+                                                invoiceNumber : newOrder,
+                                                customerPhone : req.session.phone,
+                                                stripeCharge : charge.id,
+                                                items : items,
+                                                totalPacks : totalQuantity,
+                                                pricePerPack : totalPrice / totalQuantity,
+                                                completionDate : new Date(),
+                                                paid : charge.amount / 100,
+                                            }, function(err,order){
+                                                if(err){
+                                                    console.log('ERROR - Creating order');
+                                                    console.log('Customer: '+firstName+' '+lastName);
+                                                    console.log('Email: '+email);
+                                                    console.log(err);
+                                                    res.send({result:'error',error:'Something went wrong. Please refresh and try again in a minute.'});
+                                                } else {
+                                                    console.log('----- Order created -----');
+                                                    console.log('Invoice: '+newOrder);
+                                                    console.log('Customer: '+firstName+' '+lastName);
+                                                    console.log('Phone: '+phone);
+                                                    res.send({result:'success'});
+                                                }
+                                            });
 
-                                            //Klaviyo Order
-                                            klaviyoPlacedOrder(req.session.email);
-                                            if(totalPrice >= pricing['oc-box']){
-                                              customerType(req.session.email, 'Full');
-                                            } else {
-                                              customerType(req.session.email, 'Trial');
-                                            }
-
-                                            var channel = 'ground shipping';
-                                            if(req.session.shipping == 'campus'){
-                                                TextOrder.create({
-                                                    firstName : req.session.firstName,
-                                                    lastName : req.session.lastName,
-                                                    email : req.session.email,
-                                                    invoiceNumber : newOrder,
-                                                    customerPhone : req.session.phone,
-                                                    stripeCharge : charge.id,
-                                                    items : items,
-                                                    totalBars : totalQuantity,
-                                                    pricePerBar : discountedPrice / totalQuantity,
-                                                    shipping : {
-                                                        shippingType : req.session.shipping,
-                                                        status : 'Pending'
-                                                    },
-                                                    orderType : 'Web',
-                                                    school : req.session.school,
-                                                    completionDate : new Date(),
-                                                    paid : charge.amount / 100,
-                                                    source : source
-                                                }, function(err,order){
-                                                    if(err){
-                                                        console.log('ERROR - Creating order');
-                                                        console.log('Customer: '+firstName+' '+lastName);
-                                                        console.log('Email: '+email);
-                                                        console.log(err);
-                                                        res.send({result:'error',error:'Something went wrong. Please refresh and try again in a minute.'});
-                                                    } else {
-                                                        console.log('----- Order created -----');
-                                                        console.log('Invoice: '+newOrder);
-                                                        console.log('Customer: '+firstName+' '+lastName);
-                                                        console.log('Phone: '+phone);
-                                                        res.send({result:'success'});
-                                                    }
-                                                });
-
-                                                SchoolInfo.findOne({"school":req.session.school}, function(err,info){
-                                                    if(err){
-                                                        console.log('ERROR - find school');
-                                                        console.log('School: '+req.session.school);
-                                                        console.log(err);
-                                                    } else{
-                                                        if(info){
-                                                            info.inventory-=charge.amount/(1.8*100);
-                                                            info.webPurchases+=1;
-                                                            info.numberLinksSent+=1;
-                                                            info.barsSold+=charge.amount/(1.8*100);
-                                                            info.save();
-
-                                                            // Non-Yale send message to Reps via Slack. Example below:
-                                                            // if(req.body.school == 'Wesleyan'){
-                                                            //     var message ='New order has come in! Reply "'+newOrder+'" to claim the delivery.';
-                                                            //     var payload = {
-                                                            //         token : process.env.SLACKTOKEN,
-                                                            //         channel : found.repSlack,
-                                                            //         text : message,
-                                                            //         as_user : false,
-                                                            //         username : 'Verb Bot'
-                                                            //     };
-
-                                                            //     slackPost('chat.postMessage', [payload]);
-                                                            // }
-
-                                                        } else {
-                                                            console.log('ERROR - find school');
-                                                            console.log('School: '+req.session.school);
-                                                        }
-                                                    }
-                                                });
-                                                channel = req.session.school;
-                                                found.school = req.session.school;
-                                                web.groups.rename(found.slackChannel, req.session.school.substr(0,4)+'-'+firstName+'-'+lastName);
-                                            } else {
-                                                TextOrder.create({
-                                                    firstName : req.session.firstName,
-                                                    lastName : req.session.lastName,
-                                                    email : req.session.email,
-                                                    invoiceNumber : newOrder,
-                                                    customerPhone : req.session.phone,
-                                                    stripeCharge : charge.id,
-                                                    items : items,
-                                                    totalBars : totalQuantity,
-                                                    pricePerBar : discountedPrice / totalQuantity,
-                                                    shipping : {
-                                                        shippingType : req.session.shipping,
-                                                        status : 'Pending'
-                                                    },
-                                                    orderType : 'Web',
-                                                    address : {
-                                                        address1 : req.session.address1,
-                                                        address2 : req.session.address2,
-                                                        city : req.session.city,
-                                                        state : req.session.state,
-                                                        zip : req.session.zip
-                                                    },
-                                                    completionDate : new Date(),
-                                                    paid : charge.amount / 100,
-                                                    source : source
-                                                }, function(err,order){
-                                                    if(err){
-                                                        console.log('ERROR - Creating order');
-                                                        console.log('Customer: '+firstName+' '+lastName);
-                                                        console.log('Email: '+email);
-                                                        console.log(err);
-                                                        res.send({result:'error',error:'Something went wrong. Please refresh and try again in a minute.'});
-                                                    } else {
-                                                        console.log('----- Order created -----');
-                                                        console.log('Invoice: '+newOrder);
-                                                        console.log('Customer: '+firstName+' '+lastName);
-                                                        console.log('Phone: '+phone);
-                                                        res.send({result:'success'});
-                                                    }
-                                                });
-
-                                                found.address = {
-                                                    shippingAddress : {
-                                                        address1 : req.session.address1,
-                                                        address2 : req.session.address2,
-                                                        city : req.session.city,
-                                                        state : req.session.state,
-                                                        zip : req.session.zip
-                                                    }
-                                                };
-                                                web.groups.rename(found.slackChannel, 'web-'+firstName+'-'+lastName);
-                                            }
-
+                                           
                                             found.firstName = req.session.firstName;
                                             found.lastName = req.session.lastName;
                                             found.email = req.session.email;
@@ -918,19 +570,17 @@ router.post("/cart/web-charge", function(req,res){
                                                 exp_year : charge.source.exp_year
                                             };
                                             
-                                            web.groups.setPurpose(found.slackChannel,found.firstName+' '+found.lastName);
-                                            found.status="WEBPURCHASED";
 
 
                                             //Change this to order confirmation and reorder. Line 335 on twilio.js
                                             // var message = 'Your order of Verb Bars has been completed! You\'ll get another text as soon as your order ships. For future orders, you won\'t need to re-enter your credit card information and can just text this number to reorder.';
-                                            var messageBody = 'Your order of Verb Bars has been completed! We\'re also testing out something totally new for you to try.\n\nYour payment method is now securely linked to your phone number. If you want to place another order, just text us at this number (sms:415-915-8372) saying that you want more Verb Bars and they\'ll ship out the next day. Give it a try when you\'re running out!';
+                                            var messageBody = 'Your order of Toilet Paper has been completed! Your payment method is now securely linked to your phone number. If you want to place another order, just text me at this number (sms:786-460-3490) saying that you want more Toilet Paper and it\'ll ship out the next day.';
 
                                             client.messages.create({
                                                 body:messageBody,
-                                                to:req.session.phone,
-                                                from:'+14159158372',
-                                                statusCallback: 'https://dash.verbenergybar.com/twilioCallBack',
+                                                to:phone,
+                                                from:'+17864603490',
+                                                statusCallback: 'https://monteiro-senior-project.herokuapp.com/twilioCallBack',
                                             }, function(err,message){
                                                 if(err){
                                                     console.log('ERROR - Sending order confirmation text');
@@ -947,29 +597,6 @@ router.post("/cart/web-charge", function(req,res){
                                                     found.save();
                                                 }
                                             }); 
-
-                                            var payloads = [];
-
-                                            var payload = {
-                                                token : process.env.SLACKTOKEN,
-                                                channel : found.slackChannel,
-                                                text : messageBody,
-                                                as_user : false,
-                                                username : 'Verb Bot'
-                                            };
-                                            payloads.push(payload);
-
-                                            var payload = {
-                                                token : process.env.SLACKTOKEN,
-                                                channel : process.env.NOTIFYVERBSLACK,
-                                                text : 'Order '+newOrder+ ' - '+channel+'. '+found.firstName+' '+found.lastName+'. '+totalQuantity.toString()+' Bars',
-                                                as_user : false,
-                                                username : 'Verb Bot'
-                                            };
-                                            payloads.push(payload);
-
-                                            slackPost('chat.postMessage', payloads);
-
                                             resetSession(req);
                                         }
                                     });
@@ -1001,11 +628,7 @@ router.post("/cart/web-charge", function(req,res){
                                 res.send({result:'error', error:'Something went wrong. Please refresh the page and try again.'});
                             } else{
                                 if(order){
-                                    console.log(order.invoiceNumber);
-                                    console.log(order.invoiceNumber.substr(3));
                                     var number = parseInt(order.invoiceNumber.substr(3))+1;
-                                    console.log(number);
-                                    // console.log()
                                     var newOrder = 'VRB'+number.toString();
                                 } else{
                                     var newOrder = 'VRB1000';
@@ -1016,37 +639,16 @@ router.post("/cart/web-charge", function(req,res){
                                 var totalQuantity = 0;
                                 var totalPrice = 0;
                                 req.session.items.forEach(function(item){
-                                    totalQuantity += productQuant[item.id]*item.quantity;
-                                    totalPrice += pricing[item.id]*item.quantity;
+                                    totalQuantity += item.quantity;
+                                    totalPrice += 20*item.quantity;
                                 });
                                 totalQuantity = parseInt(totalQuantity);
 
-                                var discountedPrice = totalPrice;
-                                var discount = [];
-                                //Change this to all discount codes
-                                if(req.session.promocode && Object.keys(req.session.promocode).length){
-                                  if(req.session.promocode['SHAREVERB']){
-                                    var difference = totalPrice*req.session.promocode['SHAREVERB'][2]/100;
-                                    discountedPrice = totalPrice-difference;
-                                    discount.push({
-                                      code : 'SHAREVERB',
-                                      discountType : 'percent',
-                                      amount : req.session.promocode['SHAREVERB'][2]
-                                    });
-                                  }
-                                }
-
-
-                                var source = req.session.src;
-                                if(!source){
-                                  source = 'none';
-                                }
-
                                 stripe.charges.create({
-                                    amount : Math.round(discountedPrice * 100),
+                                    amount : Math.round(totalPrice * 100),
                                     currency : 'usd',
                                     customer : customer.id,
-                                    description : totalQuantity.toString()+" Verb Bars",
+                                    description : totalQuantity.toString()+" TP Mega Packs",
                                     receipt_email : req.session.email,
                                     metadata : {'invoiceNumber':newOrder}
                                 }, function(err,charge){
@@ -1059,7 +661,7 @@ router.post("/cart/web-charge", function(req,res){
 
                                         var items = req.session.items;
                                         items.forEach(function(item){
-                                            item.price = pricing[item.id];
+                                            item.price = 20;
                                             item.totalPrice = item.quantity*item.price;
                                         });
 
@@ -1075,154 +677,55 @@ router.post("/cart/web-charge", function(req,res){
                                                 exp_month : charge.source.exp_month,
                                                 exp_year : charge.source.exp_year
                                             },
-                                            status : "WEBPURCHASED",
                                             totalOrders : 1,
                                             totalValue : charge.amount / 100,
                                             orders : [
                                                 { invoiceNumber : newOrder }
                                             ],
                                             chat : [],
-                                            created : new Date(),
-                                            source : source
+                                            created : new Date()
                                         };
-                                        //Klaviyo Order
-                                        // klaviyoPlacedOrder(req.session.email);
-                                        klaviyoFirstOrder(req.session.email);
 
-                                        if(totalPrice >= pricing['oc-box']){
-                                          customerType(req.session.email, 'Full');
-                                        } else {
-                                          customerType(req.session.email, 'Trial');
-                                        }
-                                        
-                                        var channel = 'ground shipping';
+                                        TextOrder.create({
+                                            firstName : req.session.firstName,
+                                            lastName : req.session.lastName,
+                                            email : req.session.email,
+                                            invoiceNumber : newOrder,
+                                            customerPhone : req.session.phone,
+                                            stripeCharge : charge.id,
+                                            items : items,
+                                            totalPacks : totalQuantity,
+                                            pricePerPack : totalPrice / totalQuantity,
+                                            completionDate : new Date(),
+                                            paid : charge.amount / 100,
+                                        }, function(err,order){
+                                            if(err){
+                                                console.log('ERROR - Creating order');
+                                                console.log('Customer: '+newCustomer.firstName+' '+newCustomer.lastName);
+                                                console.log('Email: '+newCustomer.email);
+                                                console.log(err);
+                                                res.send({result:'error',error:'Something went wrong. Please refresh and try again in a minute.'});
+                                            } else {
+                                                console.log('----- Order created -----');
+                                                console.log('Invoice: '+newOrder);
+                                                console.log('Customer: '+newCustomer.firstName+' '+newCustomer.lastName);
+                                                console.log('Phone: '+newCustomer.phone);
+                                                res.send({result:'success'});
+                                            }
+                                        });
+                                        newCustomer.address = {
+                                            shippingAddress : {
+                                                address1 : req.session.address1,
+                                                address2 : req.session.address2,
+                                                city : req.session.city,
+                                                state : req.session.state,
+                                                zip : req.session.zip
+                                            }
+                                        };
 
-                                        if(req.session.shipping == 'campus'){
-                                            SchoolInfo.findOne({"school":req.session.school}, function(err,info){
-                                                if(err){
-                                                    console.log('ERROR - find school');
-                                                    console.log('School: '+req.session.school);
-                                                    console.log(err);
-                                                } else{
-                                                    if(info){
-                                                        info.inventory-=charge.amount/(1.8*100);
-                                                        info.webPurchases+=1;
-                                                        info.numberLinksSent+=1;
-                                                        info.barsSold+=charge.amount/(1.8*100);
-                                                        info.save();
-
-                                                        // Non-Yale send message to Reps via Slack. Example below:
-                                                        // if(req.body.school == 'Wesleyan'){
-                                                        //     var message ='New order has come in! Reply "'+newOrder+'" to claim the delivery.';
-                                                        //     var payload = {
-                                                        //         token : process.env.SLACKTOKEN,
-                                                        //         channel : found.repSlack,
-                                                        //         text : message,
-                                                        //         as_user : false,
-                                                        //         username : 'Verb Bot'
-                                                        //     };
-
-                                                        //     slackPost('chat.postMessage', [payload]);
-                                                        // }
-
-                                                    } else {
-                                                        console.log('ERROR - find school');
-                                                        console.log('School: '+req.session.school);
-                                                    }
-                                                }
-                                            });
-
-                                            TextOrder.create({
-                                                firstName : req.session.firstName,
-                                                lastName : req.session.lastName,
-                                                email : req.session.email,
-                                                invoiceNumber : newOrder,
-                                                customerPhone : req.session.phone,
-                                                stripeCharge : charge.id,
-                                                items : items,
-                                                totalBars : totalQuantity,
-                                                pricePerBar : discountedPrice / totalQuantity,
-                                                shipping : {
-                                                    shippingType : req.session.shipping,
-                                                    status : 'Pending'
-                                                },
-                                                orderType : 'Web',
-                                                school : req.session.school,
-                                                completionDate : new Date(),
-                                                paid : charge.amount / 100,
-                                                source : source
-                                            }, function(err,order){
-                                                if(err){
-                                                    console.log('ERROR - Creating order');
-                                                    console.log('Customer: '+newCustomer.firstName+' '+newCustomer.lastName);
-                                                    console.log('Email: '+newCustomer.email);
-                                                    console.log(err);
-                                                    res.send({result:'error',error:'Something went wrong. Please refresh and try again in a minute.'});
-                                                } else {
-                                                    console.log('----- Order created -----');
-                                                    console.log('Invoice: '+newOrder);
-                                                    console.log('Customer: '+order.firstName+' '+order.lastName);
-                                                    console.log('Phone: '+order.customerPhone);
-                                                    res.send({result:'success'});
-                                                }
-                                            });
-                                            channel = req.session.school;
-                                            newCustomer.school = req.session.school;
-                                        } else {
-                                            TextOrder.create({
-                                                firstName : req.session.firstName,
-                                                lastName : req.session.lastName,
-                                                email : req.session.email,
-                                                invoiceNumber : newOrder,
-                                                customerPhone : req.session.phone,
-                                                stripeCharge : charge.id,
-                                                items : items,
-                                                totalBars : totalQuantity,
-                                                pricePerBar : discountedPrice / totalQuantity,
-                                                shipping : {
-                                                    shippingType : req.session.shipping,
-                                                    status : 'Pending'
-                                                },
-                                                orderType : 'Web',
-                                                address : {
-                                                    address1 : req.session.address1,
-                                                    address2 : req.session.address2,
-                                                    city : req.session.city,
-                                                    state : req.session.state,
-                                                    zip : req.session.zip
-                                                },
-                                                completionDate : new Date(),
-                                                paid : charge.amount / 100,
-                                                source : source
-                                            }, function(err,order){
-                                                if(err){
-                                                    console.log('ERROR - Creating order');
-                                                    console.log('Customer: '+newCustomer.firstName+' '+newCustomer.lastName);
-                                                    console.log('Email: '+newCustomer.email);
-                                                    console.log(err);
-                                                    res.send({result:'error',error:'Something went wrong. Please refresh and try again in a minute.'});
-                                                } else {
-                                                    console.log('----- Order created -----');
-                                                    console.log('Invoice: '+newOrder);
-                                                    console.log('Customer: '+newCustomer.firstName+' '+newCustomer.lastName);
-                                                    console.log('Phone: '+newCustomer.phone);
-                                                    res.send({result:'success'});
-                                                }
-                                            });
-                                            newCustomer.address = {
-                                                shippingAddress : {
-                                                    address1 : req.session.address1,
-                                                    address2 : req.session.address2,
-                                                    city : req.session.city,
-                                                    state : req.session.state,
-                                                    zip : req.session.zip
-                                                }
-                                            };
-                                        }
 
                                         var phone = req.session.phone;
                                         resetSession(req);
-                                        // res.send({result:'success'}); 
 
                                         TextCustomer.create(newCustomer, function(err,created){
                                             if(err){
@@ -1231,127 +734,53 @@ router.post("/cart/web-charge", function(req,res){
                                                 console.log(err);
                                                 //ERROR
                                             } else {
-                                                var slackname = '';
-                                                if(created.school){
-                                                    slackname = created.school.substr(0,4)+'-'+created.firstName+'-'+created.lastName;
-                                                } else{
-                                                    slackname = 'web-'+created.firstName+'-'+created.lastName;
-                                                }
-                                                web.groups.create(slackname, function(err,res){
-                                                    if(err){
-                                                        console.log('ERROR - Creating slack channel');
-                                                        console.log(err);
-                                                    } else {
+                                                
+                                              var firstText = 'Thanks for trying OHSHT, '+created.firstName+'! Just text us here when you’d like more.'
+                                              client.messages.create({
+                                                body:firstText,
+                                                to:phone,
+                                                from:'+17864603490',
+                                                statusCallback: 'https://monteiro-senior-project.herokuapp.com/twilioCallBack',
+                                              }, function(err,message){
+                                                  if(err){
+                                                      console.log('ERROR - Sending order confirmation text');
+                                                      console.log('Phone: '+phone);
+                                                      console.log(err);
+                                                  } else {
+                                                      //TODO add message to a message database and add message ID to customer conversation, unwrap in CRM
+                                                      created.chat.push({
+                                                          message : firstText,
+                                                          sender : 'Verb',
+                                                          timestamp : new Date(),
+                                                          messageID : message.sid,
+                                                          status : 'pending'
+                                                      });
+                                                      created.save();
+                                                  }
+                                              }); 
 
-                                                        created.slackChannel = res.group.id;
-                                                            
-                                                        created.save();
-
-                                                        var finished = _.after(2, channelsCreated);
-
-                                                        web.groups.setPurpose(res.group.id,created.firstName+' '+created.lastName);
-
-                                                        web.groups.invite(res.group.id,process.env.MATTSLACK, function(error,res){
-                                                            if(err){
-                                                                console.log('ERROR - inviting Matt');
-                                                                console.log(err);
-                                                            } else {
-                                                                finished();
-                                                            }
-                                                        });
-                                                        web.groups.invite(res.group.id,process.env.BENNETTSLACK, function(error,res){
-                                                            if(err){
-                                                                console.log('ERROR - inviting Bennett');
-                                                                console.log(err);
-                                                            } else {
-                                                                finished();
-                                                            }
-                                                        });
-
-                                                        function channelsCreated(){
-                                                            // var firstText = 'Bennett just gasped in excitement when he saw that you decided to try Verb Bars! By the way, your payment method is now securely linked to your phone number, so just text us if you\’d like to order more bars 😋';
-                                                            var firstText = 'Thanks for trying Verb Bars, '+created.firstName+'! Just text us here when you’d like more :) It’s actually just the three of us, not a robot. Have a great one!  - André, Bennett, and Matt'
-                                                            client.messages.create({
-                                                                body:firstText,
-                                                                to:phone,
-                                                                from:'+14159158372',
-                                                                statusCallback: 'https://dash.verbenergybar.com/twilioCallBack',
-                                                            }, function(err,message){
-                                                                if(err){
-                                                                    console.log('ERROR - Sending order confirmation text');
-                                                                    console.log('Phone: '+phone);
-                                                                    console.log(err);
-                                                                } else {
-                                                                    //TODO add message to a message database and add message ID to customer conversation, unwrap in CRM
-                                                                    created.chat.push({
-                                                                        message : firstText,
-                                                                        sender : 'Verb',
-                                                                        timestamp : new Date(),
-                                                                        messageID : message.sid,
-                                                                        status : 'pending'
-                                                                    });
-                                                                    created.save();
-                                                                }
-                                                            }); 
-
-                                                            var payloads = [];
-
-                                                            var payload = {
-                                                                token : process.env.SLACKTOKEN,
-                                                                channel : res.group.id,
-                                                                text : firstText,
-                                                                as_user : false,
-                                                                username : 'Verb Bot'
-                                                            };
-                                                            payloads.push(payload);
-
-                                                            var payload = {
-                                                                token : process.env.SLACKTOKEN,
-                                                                channel : process.env.NOTIFYVERBSLACK,
-                                                                text : 'Order '+newOrder+ ' - '+channel+'. '+created.firstName+' '+created.lastName+'. '+totalQuantity.toString()+' Bars',
-                                                                as_user : false,
-                                                                username : 'Verb Bot'
-                                                            };
-
-                                                            payloads.push(payload);
-
-                                                            var secondText = 'To make it easier to reorder, here\'s our contact card!';
-                                                            client.messages.create({
-                                                                body:secondText,
-                                                                to:phone,
-                                                                from:'+14159158372',
-                                                                mediaUrl:'https://dash.verbenergybar.com/verb.vcf',
-                                                                statusCallback: 'https://dash.verbenergybar.com/twilioCallBack',
-                                                            }, function(err,message){
-                                                                if(err){
-                                                                    console.log('ERROR - Sending contact card text');
-                                                                    console.log('Phone: '+phone);
-                                                                    console.log(err);
-                                                                } else{
-                                                                    created.chat.push({
-                                                                        message : secondText,
-                                                                        sender : 'Verb',
-                                                                        timestamp : new Date(),
-                                                                        messageID : message.sid,
-                                                                        status : 'pending'
-                                                                    });
-                                                                    created.save();
-                                                                }
-                                                            });
-
-                                                            var payload = {
-                                                                token : process.env.SLACKTOKEN,
-                                                                channel : res.group.id,
-                                                                text : secondText,
-                                                                as_user : false,
-                                                                username : 'Verb Bot'
-                                                            };
-                                                            payloads.push(payload);
-
-                                                            slackPost('chat.postMessage', payloads);
-                                                        }
-                                                    }
-                                                });
+                                              var secondText = 'To make it easier to reorder, here\'s our contact card!';
+                                              client.messages.create({
+                                                body:secondText,
+                                                to:phone,
+                                                from:'+17864603490',
+                                                statusCallback: 'https://monteiro-senior-project.herokuapp.com/twilioCallBack',
+                                              }, function(err,message){
+                                                  if(err){
+                                                      console.log('ERROR - Sending contact card text');
+                                                      console.log('Phone: '+phone);
+                                                      console.log(err);
+                                                  } else{
+                                                      created.chat.push({
+                                                          message : secondText,
+                                                          sender : 'Verb',
+                                                          timestamp : new Date(),
+                                                          messageID : message.sid,
+                                                          status : 'pending'
+                                                      });
+                                                      created.save();
+                                                  }
+                                              });
                                             }
                                         });
                                     }
@@ -1455,40 +884,6 @@ router.post("/reorder", function(req,res){
                                           }
                                       });
 
-                                      SchoolInfo.findOne({"school":req.body.school}, function(err,info){
-                                          if(err){
-                                              console.log('ERROR - find school');
-                                              console.log('School: '+req.body.school);
-                                              console.log(err);
-                                              // No school?
-                                          } else{
-                                              if(info){
-                                                  info.inventory-=charge.amount/(1.8*100);
-                                                  info.webPurchases+=1;
-                                                  info.numberLinksSent+=1;
-                                                  info.barsSold+=charge.amount/(1.8*100);
-                                                  info.save();
-
-                                                  // Non-Yale send message to Reps via Slack. Example below:
-                                                  // if(req.body.school == 'Wesleyan'){
-                                                  //     var message ='New order has come in! Reply "'+newOrder+'" to claim the delivery.';
-                                                  //     var payload = {
-                                                  //         token : process.env.SLACKTOKEN,
-                                                  //         channel : found.repSlack,
-                                                  //         text : message,
-                                                  //         as_user : false,
-                                                  //         username : 'Verb Bot'
-                                                  //     };
-
-                                                  //     slackPost('chat.postMessage', [payload]);
-                                                  // }
-
-                                              } else {
-                                                  console.log('ERROR - find school');
-                                                  console.log('School: '+req.body.school);
-                                              }
-                                          }
-                                      });
 
                                       channel = req.body.school;
 
@@ -1632,21 +1027,23 @@ router.post("/reorder", function(req,res){
 
 function resetSession(req){
 
-    req.session.cartTotal = 0;
-    req.session.firstName = '';
-    req.session.lastName = '';
-    req.session.email = '';
-    req.session.phone = '';
-    req.session.address1 = '';
-    req.session.address2 = '';
-    req.session.city = '';
-    req.session.state = '';
-    req.session.zip = '';
-    req.session.school = '';
-    req.session.error = '';
-    req.session.items=[];
-    req.session.src = '';
-    delete req.session.promocode;
+    delete req.session;
+
+    // req.session.cartTotal = 0;
+    // req.session.firstName = '';
+    // req.session.lastName = '';
+    // req.session.email = '';
+    // req.session.phone = '';
+    // req.session.address1 = '';
+    // req.session.address2 = '';
+    // req.session.city = '';
+    // req.session.state = '';
+    // req.session.zip = '';
+    // req.session.school = '';
+    // req.session.error = '';
+    // req.session.items=[];
+    // req.session.src = '';
+    // delete req.session.promocode;
 
 }
 
