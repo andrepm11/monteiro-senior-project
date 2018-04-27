@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <meta charset="utf-8">
+  <title>Verb Energy</title>
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0' name='viewport' />
+  <meta name="description" content="
+                                    No jitters. No crash. No chemicals. Just focused, all-day, feel-good energy. 
+                                    " />
+  <meta name="author" content="Verb Energy, Inc." />
+  <meta name="copyright" content="2017" />
+  <meta name="robots" content="index, follow" />
+  <meta name="robots" content="noodp, noydir" />
+  <meta name="subject" content="
+                                No jitters. No crash. No chemicals. Just focused, all-day, feel-good energy. 
+                                ">
+  <meta name="Language" content="English">
+  <meta http-eqiv="Expires" content="never">
+  <meta http-eqiv="CACHE-CONTROL" content="NO-CACHE">
+  <meta http-eqiv="PRAGMA" content="NO-CACHE">
+  <meta name="Publisher" content="Verb Energy, Inc">
+  <meta name="Revisit-After" content="10 days">
+  <meta name="distribution" content="Global">
+  <meta name="country" content="USA">
+  <meta name="MSSmartTagsPreventParsing" content="true">
+  <meta name="rating" content="General">
+  <meta name="ms.locale" content="EN-US">
+  <meta name="category" content="homepage">
+  <meta name="url" content="https://www.verbenergybar.com">
+  <meta name="google-site-verification" content="bZwITXADeckUh-kC_elVDED-Ibk2e-DhdZh7jtdU8No" />
+
+<!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,900|Montserrat+Alternates:400i,700i" rel="stylesheet">
+  <link href="https://cdn.snipcart.com/themes/2.0/base/snipcart.min.css" type="text/css" rel="stylesheet" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+
+  
+  <!-- <link rel="stylesheet" href="/css/shop.css"> -->
+  <link rel="stylesheet" href="/css/main-1.css">
+  <link rel="stylesheet" href="/css/main-style.css">
+</head>
+
+<body>
+  
+
+	<link rel="stylesheet" href="https://use.typekit.net/cie4idu.css">
+	<link rel="stylesheet" href="/css/cart.css">
+
+
+	<div class="container-fluid">
+		<div class="row" style="background-color:#F2F4F5;">
+			<div class="col-12">
+				<p class="text-center mb-0 pt-1 pb-1" style="font-size:0.9em;"><i>"Time flies like an arrow; fruit flies like a banana."</i></p>
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+
+		<div class="row pt-4 pb-1">
+			<div class="col-12">
+				<h2 class="text-center title"><a href="/">VERB ENERGY</a></h2>
+			</div>
+		</div>
+	<% if(items && items[0]){ %>
+	  <div id="cart" style="display:block;">
+	<%} else {%>
+	  <div id="cart" style="display:none;">
+	<%}%>
+	  <form id="cart-form">
+		<div class="row pl-md-5 pr-md-5">
+
+			<div id="cart-section" class="col-12 col-md-5 order-md-2 pb-3">
+			</div>
+
+			<div id="checkout" class="pb-5 col-12 col-md-7 order-md-1">
+				
+				<h2 class="cart-header offset-1 col-10 pl-0 pr-0 h4">Your Info</h2>
+				<div class="col-10 pl-0 pr-0 offset-1">
+					<div class="row pb-2">
+						<div class="col-12">
+							<input id="email" type="email" class="form-control" name="email" value="<%= email %>" required placeholder="E-mail">
+						</div>
+					</div>
+					<div class="row pb-2">
+						<div class="col-sm-6 col-12 pb-lg-0 pb-2">
+							<input autocapitalize="words" id="firstName" name="firstName" class="form-control" type="text" placeholder="First Name" required value="<%= firstName %>">
+						</div>
+						<div class="col-sm-6 col-12 pb-lg-0">
+							<input autocapitalize="words" id="lastName" name="lastName" class="form-control" type="text" placeholder="Last Name" required value="<%= lastName %>">
+						</div>
+					</div>
+				</div>
+
+				<h2 class="cart-header offset-1 col-10 pl-0 pr-0 h4 pt-3">Mobile Phone Number</h2>
+
+				<div class="col-10 pl-0 pr-0 offset-1">
+					<div class="row pb-2">
+
+						<div class="col-12">
+							<div id="phone-alert" class="alert-div">
+							</div>
+							<input id="phone" autocomplete="off" required type="tel" class="form-control" name="phone" value="+1 (<% if(phone && phone.length>10){ %><%= phone.substr(4) %><% } else if(phone && phone.length==10){ %><%=phone%><%}%>" <% if(query.phone){%>readonly<%} %> data-next="payment-shipping" placeholder="Mobile Phone Number">
+						</div>
+					</div>
+				</div>
+
+				<h2 class="cart-header offset-1 col-10 pl-0 pr-0 h4 pt-3">Shipping</h2>
+				<div class="col-10 pl-0 pr-0 offset-1">
+					<!-- <div class="row">
+						<div class="col-8 offset-1">
+							<label><input type="radio" name="shipping" checked="checked" value="ground" data-div="shipping-ground"> Ground Shipping</label>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-8 offset-1">
+							<label><input type="radio" name="shipping" value="campus" data-div="shipping-school"> Campus Pick-up</label>
+						</div>
+					</div> -->
+					<div class="shipping-div" id="shipping-ground">
+						<div class="row pb-2">
+							<div class="col-sm-8 col-12 pb-lg-0 pb-2">
+								<input id="address1" autocapitalize="words" required type="text" class="form-control address-field" name="address1" value="<%= address1 %>" placeholder="Address">
+							</div>
+							<div class="col-sm-4 col-12 pb-lg-0">
+								<input id="address2" autocapitalize="words" type="text" class="form-control address-field" name="address2" value="<%= address2 %>" placeholder="Apt, suite">
+							</div>
+						</div>
+						<div class="row pb-2">
+							<div class="col-12">
+								<input id="city" autocapitalize="words" required type="text" class="form-control address-field" name="city" value="<%= city %>" placeholder="City">
+							</div>
+						</div>
+						<div class="row pb-2">
+							<div class="col-sm-8 col-12 pb-lg-0 pb-2">
+								<input autocapitalize="characters" id="state" required type="text" class="form-control address-field" name="state" value="<%= state %>" placeholder="State">
+							</div>
+							<div class="col-sm-4 col-12 pb-lg-0">
+								<input id="zip" required type="number" pattern="\d*" class="form-control address-field" name="zip" value="<%= zip %>" placeholder="Zip Code">
+							</div>
+						</div>
+					</div>
+					<!-- <div class="shipping-div" id="shipping-school" style="display:none;">
+						<div class="row pb-2">
+							<p class="col-11" style="font-size:1.3em;">School</p>
+							<div class="offset-1 col-10">
+								<label><input type="radio" name="school" value="Yale" checked="checked">Yale</label>
+								
+							</div>
+						</div>
+					</div> -->
+				</div>
+
+				<h2 class="cart-header col-10 pl-0 pr-0 offset-1 h4 pt-3">Payment Info</h2>
+				<div class="col-10 offset-1 pb-3">
+					<div class="row">
+						<!-- <div class="col-12"> -->
+							<div id="card-errors" class="small text-danger" style="display: inline-block" role="alert">
+								<% if(error){ %>
+									<span><%= error %></span>
+								<% } %>
+							</div>
+							<div class="form-control mb-3" id="card-element">
+							</div>
+						<div id="place-order-alert" class="alert-div">
+						</div>
+							<!-- <div id="loading-indicator" class="col-sm-2 offset-sm-4 col-4 offset-2 no-padding" style="display:none">
+						  			<img src="/img/loading_1.gif">
+				      		</div> -->
+			      		<!-- </div> -->
+					</div>
+
+				</div>
+
+				<div class="row mb-5 pb-5 mb-md-0 pb-md-0">
+					<div class="col-10 offset-1 text-center">
+
+						<button id="complete-order" class="btn cart-buttons mb-3"><strong>PLACE ORDER</strong></button>
+						<a href="/#OrderVerb">Continue shopping</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	  </form>
+	  </div>
+	  <% if(items && items[0]){%>
+	  	<div id="no-cart" class="mb-5 pb-5" style="display:none;">
+	  <%} else {%>
+	  	<div id="no-cart" class="mb-5 pb-5" style="display:block;">
+	  <% } %>
+	  	<div class="row mb-3">
+	  		<div class="col-12">
+	  			<h4 class="cart-header text-center">Please add something to your cart before checking out.</h4>
+	  			<h4 class="cart-header text-center"><a href="/#OrderVerb">Go home</a></h4>
+	  			<h4 class="cart-header text-center"><a href="/trial">Or try Verb</a></h4>
+	  		</div>
+	  	</div>
+	  </div>
+
+	  <div id="payment-complete" class="mb-5 pb-5" style="display:none;">
+	  	<div class="row mb-3">
+	  		<div class="col-12">
+	  			<h4 class="cart-header text-center">Thanks so much for your order!</h4>
+	  		</div>
+	  	</div>
+	  	<div class="row">
+	  	<div class="col-12">
+
+	  		<form id="friend-form">
+	  			<div class="col-10 pl-0 pr-0 offset-1 mb-3">
+	  				<h4 class="cart-header text-center mb-3">Want to send 3 bars to a friend on us? Just give us a way to reach out and we'll handle the rest.</h4>
+					<div class="row pb-2">
+						<div class="col-12">
+							<input id="friendemail" type="email" class="form-control" name="email" required placeholder="Friend's E-mail">
+						</div>
+					</div>
+					<div class="row pb-2">
+						<div class="col-sm-6 col-12 pb-lg-0 pb-2">
+							<input autocapitalize="words" id="friendfirstName" name="firstName" class="form-control" type="text" placeholder="Friend's First Name" required>
+						</div>
+						<div class="col-sm-6 col-12 pb-lg-0">
+							<input autocapitalize="words" id="friendlastName" name="lastName" class="form-control" type="text" placeholder="Friend's Last Name" required>
+						</div>
+					</div>
+				</div>
+				<div class="row mb-5 pb-5 mb-md-0 pb-md-0">
+					<div class="col-10 offset-1 text-center">
+						<button class="btn cart-buttons"><strong>SEND IT</strong></button>
+					</div>
+				</div>
+	  		</form>
+	  	</div>
+	  	</div>
+	  </div>
+	   <div id="friend-complete" class="mb-5 pb-5" style="display:none;">
+	  	<div class="row mb-3">
+	  		<div class="col-12">
+	  			<h4 class="cart-header text-center">Thanks for sharing Verb!</h4>
+	  			<h4 class="cart-header text-center">Feel free to check us out on <a href="https://www.instagram.com/verbenergy">Instagram: @verbenergy</a></h4>
+	  			<h4 class="cart-header text-center">Or <a href="sms:4159158372">text us</a> if you want to say hi.</h4>
+	  		</div>
+	  	</div>
+	  </div>
+		<div class="row pl-md-5 pr-md-5 cart-footer">
+			<div class="col-7">
+				<p><a href="/">Home Page</a></p>
+				<p><a href="/trial">Trial Page</a></p>
+			</div>
+			<div class="col-3">
+				<p>&copy; 2018 Verb Energy, Inc.</p>
+				<p>All Rights Reserved.</p>
+			</div>
+			<div class="col-2">
+				<img id="footer-logo" style="max-width:100%;" src="/img/verb_logo_500x188px.png" alt="Verb Energy Bars Logo" />
+			</div>
+		</div>
+	</div>
+	<div class="loader" id="loading-indicator" style="display:none;"></div>
+
+    <script>
+    	var shipping = '<%= shipping %>';
+    </script>
+
+    <% if(items && items[0]){ %>
+		<script src="/js/main-cart-3-3.js"></script>
+	<% } %>
+
+</div>
+</div>
+</body>
+</html>
