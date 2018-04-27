@@ -5,14 +5,22 @@
 		<div class="col-12" data-timestamp="<%= message.chat.timestamp %>">
 			<% if(message.chat.sender == 'Company'){ %>
 				<div class="text-bubble company-text">
-					<%= message.chat.message %>
+					<% if(message.mediaURL){ %>
+							<img class="thumbnail" src="<%=message.mediaURL%>">
+						<% } else { %>
+							<%= message.message %>
+						<% } %>
 				</div>
 				<div class="collapse company-timestamp text-muted">
 					<%= message.chat.timestamp %>
 				</div>
 			<% } else { %>
 				<div class="text-bubble customer-text">
-					<%= message.chat.message %>
+					<% if(message.mediaURL){ %>
+							<img class="thumbnail" src="<%=message.mediaURL%>">
+						<% } else { %>
+							<%= message.message %>
+						<% } %>
 				</div>
 				<div class="collapse customer-timestamp text-muted">
 					<%= message.chat.timestamp %>
