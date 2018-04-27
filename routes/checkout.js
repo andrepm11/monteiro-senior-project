@@ -428,8 +428,6 @@ router.post("/cart/web-charge", function(req,res){
                                                 exp_year : charge.source.exp_year
                                             };
 
-                                            //Change this to order confirmation and reorder. Line 335 on twilio.js
-                                            // var message = 'Your order of Verb Bars has been completed! You\'ll get another text as soon as your order ships. For future orders, you won\'t need to re-enter your credit card information and can just text this number to reorder.';
                                             var messageBody = 'Your order has been completed! Just text us if you ever want more toilet paper.';
 
                                             var phone = req.session.phone;
@@ -446,7 +444,7 @@ router.post("/cart/web-charge", function(req,res){
                                                 } else{
                                                     found.chat.push({
                                                         message : messageBody,
-                                                        sender : 'Verb',
+                                                        sender : 'Company',
                                                         timestamp : new Date(),
                                                         messageID : message.sid,
                                                         status : 'pending'
@@ -570,10 +568,6 @@ router.post("/cart/web-charge", function(req,res){
                                                 exp_year : charge.source.exp_year
                                             };
                                             
-
-
-                                            //Change this to order confirmation and reorder. Line 335 on twilio.js
-                                            // var message = 'Your order of Verb Bars has been completed! You\'ll get another text as soon as your order ships. For future orders, you won\'t need to re-enter your credit card information and can just text this number to reorder.';
                                             var messageBody = 'Your order of Toilet Paper has been completed! Your payment method is now securely linked to your phone number. If you want to place another order, just text me at this number (sms:786-460-3490) saying that you want more Toilet Paper and it\'ll ship out the next day.';
 
                                             client.messages.create({
@@ -589,7 +583,7 @@ router.post("/cart/web-charge", function(req,res){
                                                 } else{
                                                     found.chat.push({
                                                         message : messageBody,
-                                                        sender : 'Verb',
+                                                        sender : 'Company',
                                                         timestamp : new Date(),
                                                         messageID : message.sid,
                                                         status : 'pending'
@@ -750,7 +744,7 @@ router.post("/cart/web-charge", function(req,res){
                                                       //TODO add message to a message database and add message ID to customer conversation, unwrap in CRM
                                                       created.chat.push({
                                                           message : firstText,
-                                                          sender : 'Verb',
+                                                          sender : 'Company',
                                                           timestamp : new Date(),
                                                           messageID : message.sid,
                                                           status : 'pending'
@@ -773,7 +767,7 @@ router.post("/cart/web-charge", function(req,res){
                                                   } else{
                                                       created.chat.push({
                                                           message : secondText,
-                                                          sender : 'Verb',
+                                                          sender : 'Company',
                                                           timestamp : new Date(),
                                                           messageID : message.sid,
                                                           status : 'pending'
@@ -827,7 +821,7 @@ router.post("/reorder", function(req,res){
                               amount : Math.round(totalPrice * 100),
                               currency : 'usd',
                               customer : found.customerId,
-                              description : (totalQuantity/10).toString()+" Boxes of Verb Bars",
+                              description : (totalQuantity/10).toString()+" TP Packs",
                               receipt_email : found.email,
                               metadata : {'invoiceNumber':newOrder}
                           }, function(err,charge){
@@ -948,21 +942,13 @@ router.post("/reorder", function(req,res){
                                   found.totalValue += charge.amount / 100;
                                   found.orders.push({'invoiceNumber':newOrder});
 
-                                  // if(req.session.shipping == 'campus'){
-                                  //     web.groups.rename(found.slackChannel, req.session.school.substr(0,4)+'-'+found.firstName+'-'+found.lastName);
-                                  // } else {
-                                  //     web.groups.rename(found.slackChannel, 'web-'+found.firstName+'-'+found.lastName);
-                                  // }
-                                  
                                   found.status="REORDERED";
 
 
-                                  //Change this to order confirmation and reorder. Line 335 on twilio.js
-                                  // var message = 'Your order of Verb Bars has been completed! You\'ll get another text as soon as your order ships. For future orders, you won\'t need to re-enter your credit card information and can just text this number to reorder.';
                                   if(req.body.shipping == 'campus'){
-                                    var messageBody = 'Your order of Verb Bars has been completed!';
+                                    var messageBody = 'Your order of TP Packs has been completed!';
                                   }else{
-                                    var messageBody = 'Your order of Verb Bars has been completed! We\'ll let you know once they\'ve shipped.';
+                                    var messageBody = 'Your order of TP Packs has been completed! We\'ll let you know once they\'ve shipped.';
                                   }
                                   
 
@@ -979,7 +965,7 @@ router.post("/reorder", function(req,res){
                                       } else{
                                           found.chat.push({
                                               message : messageBody,
-                                              sender : 'Verb',
+                                              sender : 'Company',
                                               timestamp : new Date(),
                                               messageID : message.sid,
                                               status : 'pending'
@@ -988,29 +974,6 @@ router.post("/reorder", function(req,res){
                                       }
                                   }); 
 
-                                  var payloads = [];
-
-                                  var payload = {
-                                      token : process.env.SLACKTOKEN,
-                                      channel : found.slackChannel,
-                                      text : messageBody,
-                                      as_user : false,
-                                      username : 'Verb Bot'
-                                  };
-                                  payloads.push(payload);
-
-                                  // slackPost('chat.postMessage', payloads);
-
-                                  var payload = {
-                                      token : process.env.SLACKTOKEN,
-                                      channel : process.env.NOTIFYVERBSLACK,
-                                      text : 'Order '+newOrder+ ' - '+channel+'. '+req.body.firstName+' '+req.body.lastName+'. '+totalQuantity.toString()+' Bars',
-                                      as_user : false,
-                                      username : 'Verb Bot'
-                                  };
-                                  payloads.push(payload);
-
-                                  slackPost('chat.postMessage', payloads);
                                   
                               }
                           });
