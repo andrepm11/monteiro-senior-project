@@ -172,46 +172,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="well col-sm-12">
-            <% loadQuant %>
-            <div class="container">
-            <% if(!(loadQuant >= found.chat.length)){ %>
-                <a href="/conversations/<%= found.phone %>?loadQuant=<%= loadQuant %>"><button>Load more</button></a>
-            <% } %>
-
-
-            <% found.chat.slice(Math.max(found.chat.length-loadQuant, 0)).forEach(function(chat){ %>
-                
-                <div class="row">
-                
-                <% if(chat.sender == 'Customer'){ %>
-
-                    <div class="speech-bubble them col-md-4 pull-left"><%= chat.message %></div>
-
-                <% } else { %>
-                    <div class="speech-bubble verb col-md-4 pull-right"><%= chat.message %></div>
-                <% } %>
-                </div>
-                
-            <%  }); %>
-
-                <div>
-
-                    <form action="/newChat" method="POST">
-
-                        <input type="text" name="phone" value="<%= found.phone %>">
-
-                        <input type="text" name="message" placeholder="New Message" value="" required>
-
-                        <input type="submit" value="Send">
-
-                    </form>
-
-                </div>
-
-            </div>
-            
-        </div>
+        <a href="/crm?phone=<%=found.phone%>">Conversation</a>
     </div>
 </div>
 
