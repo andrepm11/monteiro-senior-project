@@ -684,7 +684,7 @@ router.post("/cart/web-charge", function(req,res){
                                                 { invoiceNumber : newOrder }
                                             ],
                                             chat : [],
-                                            created : new Date()
+                                            created : new Date(),
                                         };
 
                                         TextOrder.create({
@@ -786,6 +786,7 @@ router.post("/cart/web-charge", function(req,res){
                                                           messageID : message.sid,
                                                           status : 'pending'
                                                       });
+                                                      created.lastInteraction = new Date();
                                                       created.save();
                                                   }
                                               });
