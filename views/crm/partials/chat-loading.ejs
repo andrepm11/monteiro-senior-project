@@ -6,9 +6,9 @@
 			<% if(message.chat.sender == 'Company'){ %>
 				<div class="text-bubble company-text">
 					<% if(message.mediaURL){ %>
-							<img class="thumbnail" src="<%=message.mediaURL%>">
+							<img class="thumbnail" src="<%=message.chat.mediaURL%>">
 						<% } else { %>
-							<%= message.message %>
+							<%= message.chat.message %>
 						<% } %>
 				</div>
 				<div class="collapse company-timestamp text-muted">
@@ -17,9 +17,9 @@
 			<% } else { %>
 				<div class="text-bubble customer-text">
 					<% if(message.mediaURL){ %>
-							<img class="thumbnail" src="<%=message.mediaURL%>">
+							<img class="thumbnail" src="<%=message.chat.mediaURL%>">
 						<% } else { %>
-							<%= message.message %>
+							<%= message.chat.message %>
 						<% } %>
 				</div>
 				<div class="collapse customer-timestamp text-muted">
