@@ -44,37 +44,6 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-4">
-            <div class="well">
-                <h3>Create Refund</h3>
-                <form action="/refundOrder" method="POST">
-                    <div class="form-group">
-                        <label class="form-label" for="amount">Refund amount</label>
-                        <input class="form-control" type="number" name="amount" step="any" placeholder="Leave blank for whole transaction">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="reason">Reason</label>
-                        <textarea class="form-control" type="textarea" name="reason" placeholder="Customer Requested"></textarea>
-                    </div>
-                    <input type="hidden" name="stripecharge" value="<% found.stripeCharge %>">
-                    <input type="hidden" name="orderno" value="<%= found.invoiceNumber %>">
-                    <input type="submit" class="btn btn-primary" value="Submit">
-                </form>
-            </div>
-            <% if(found.refund.length > 0){ %>
-            <div class="well">
-                <h3>Refunds</h3>
-                <% found.refund.forEach(function(refund){ %>
-                    <div>
-                        <p>Amount: <%= refund.amount %></p>
-                        <p>Reason: <%= refund.reason %></p>
-                        <p>Status: <%= refund.status %></p>
-                        <p>Date: <%= refund.refundDate %></p>
-                    </div>
-                <% }); %>
-            </div>
-            <% } %>
-        </div>
     </div>
     
 </div>
