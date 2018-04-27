@@ -31,6 +31,7 @@ router.get("/crm", isLoggedIn, function(req,res){
       } else {
         
         var dayBehind = new Date(foundCustomer.lastInteraction-(24 * 60 * 60 * 1000));
+        console.log(dayBehind);
         TextCustomer.find({'lastInteraction':{'$gte':dayBehind}},{'firstName':1,'lastName':1,'phone':1,'chat': { $slice:-1 },'waitingOnResponse':1}).sort({"lastInteraction":-1}).exec(function(err,found){
             if(err){
                 console.log('CRM ERROR 1');
