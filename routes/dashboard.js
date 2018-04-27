@@ -27,12 +27,12 @@ var MessagingResponse = require('twilio').twiml.MessagingResponse;
 var https = require('https');
 var fs = require('fs');
 
-router.get("/dash", isLoggedIn, function(req,res){
+router.get("/texttobuy", isLoggedIn, function(req,res){
     var dashboardData = {};
     var finished = _.after(10, doRender);
 
     TextCustomer.aggregate(
-    {$match:
+    [{$match:
         {$and:[
             {"firstName":
                 {$ne:"Customer"}
@@ -47,7 +47,7 @@ router.get("/dash", isLoggedIn, function(req,res){
             "totalOrders":1
         }
     },
-    { "$group":{ "_id":null, "totalOrders":{"$sum":"$totalOrders"},"totalTexts":{"$sum":"$numchats"}}}, 
+    { "$group":{ "_id":null, "totalOrders":{"$sum":"$totalOrders"},"totalTexts":{"$sum":"$numchats"}}}], 
     function(err,agg){
         if(err){
             console.log(err);
@@ -63,7 +63,7 @@ router.get("/dash", isLoggedIn, function(req,res){
     });
 
     TextCustomer.aggregate(
-    {$match:
+    [{$match:
         {$and:[
             {"firstName":
                 {$ne:""}
@@ -78,7 +78,7 @@ router.get("/dash", isLoggedIn, function(req,res){
             "totalOrders":1
         }
     },
-    { "$group":{ "_id":null, "totalOrders":{"$sum":"$totalOrders"},"totalTexts":{"$sum":"$numchats"}}}, 
+    { "$group":{ "_id":null, "totalOrders":{"$sum":"$totalOrders"},"totalTexts":{"$sum":"$numchats"}}}], 
     function(err,agg){
         if(err){
             console.log(err);
@@ -93,7 +93,7 @@ router.get("/dash", isLoggedIn, function(req,res){
         }
     });
 
-    TextOrder.aggregate({$match:{"orderType":{$ne:""}}},{ "$group":{ "_id":null, "avg_value":{"$avg":"$paid"}, count:{"$sum":1}}}, function(err,agg){
+    TextOrder.aggregate([{$match:{"orderType":{$ne:""}}},{ "$group":{ "_id":null, "avg_value":{"$avg":"$paid"}, count:{"$sum":1}}}], function(err,agg){
         if(err){
             console.log(err);
         } else {
@@ -127,7 +127,7 @@ router.get("/dash", isLoggedIn, function(req,res){
     });
 
     var graph = {};
-    TextOrder.aggregate({ "$group":{ "_id":'$totalBars', count:{$sum:1}}},{"$sort":{"_id":1}}, function(err,agg){
+    TextOrder.aggregate([{ "$group":{ "_id":'$totalBars', count:{$sum:1}}},{"$sort":{"_id":1}}], function(err,agg){
         if(err){
             console.log(err);
         } else{
@@ -144,7 +144,7 @@ router.get("/dash", isLoggedIn, function(req,res){
     });
 
 
-    TextOrder.aggregate({ "$group":{"_id": { "hour":{"$hour":{ "$subtract": [ "$completionDate", 5 * 60 * 60 * 1000 ] }}},count:{$sum:1}}},{"$sort":{"_id":1}}, function(err,agg){
+    TextOrder.aggregate([{ "$group":{"_id": { "hour":{"$hour":{ "$subtract": [ "$completionDate", 5 * 60 * 60 * 1000 ] }}},count:{$sum:1}}},{"$sort":{"_id":1}}], function(err,agg){
         if(err){
             console.log(err);
         } else{
@@ -170,19 +170,21 @@ router.get("/dash", isLoggedIn, function(req,res){
         }
     });
 
-    TextOrder.aggregate({ "$group":{"_id": { "day":{"$dayOfWeek":{ "$subtract": [ "$completionDate", 5 * 60 * 60 * 1000 ] }}},count:{$sum:1}}},{"$sort":{"_id":1}}, function(err,agg){
+    TextOrder.aggregate([{ "$group":{"_id": { "day":{"$dayOfWeek":{ "$subtract": [ "$completionDate", 5 * 60 * 60 * 1000 ] }}},count:{$sum:1}}},{"$sort":{"_id":1}}], function(err,agg){
         if(err){
             console.log(err);
         } else{
             
             var days = {};
-            days['Monday'] = agg[1]['count'];
-            days['Tuesday'] = agg[2]['count'];
-            days['Wednesday'] = agg[3]['count'];
-            days['Thursday'] = agg[4]['count'];
-            days['Friday'] = agg[5]['count'];
-            days['Saturday'] = agg[6]['count'];
-            days['Sunday'] = agg[0]['count'];
+            if(agg[1]){
+                days['Monday'] = agg[1]['count'];
+                days['Tuesday'] = agg[2]['count'];
+                days['Wednesday'] = agg[3]['count'];
+                days['Thursday'] = agg[4]['count'];
+                days['Friday'] = agg[5]['count'];
+                days['Saturday'] = agg[6]['count'];
+                days['Sunday'] = agg[0]['count'];
+            }
 
             graph.days = days;
             finished();
@@ -250,12 +252,18 @@ router.get("/dash", isLoggedIn, function(req,res){
         if(err){
             console.log(err);
         } else{
+
+            if(!agg[0]){
+                agg.unshift({'revenue':0,'count':0,'boxesSold':0});
+            }
             
             if(!agg[1]){
-                if(agg[0]['boxesSold']){
-                    agg.push({'revenue':0,'count':0,'boxesSold':0})
-                } else {
-                    agg.unshift({'revenue':0,'count':0,'boxesSold':0})
+                if(agg[0]){
+                    if(agg[0]['boxesSold']){
+                        agg.push({'revenue':0,'count':0,'boxesSold':0})
+                    } else {
+                        agg.unshift({'revenue':0,'count':0,'boxesSold':0})
+                    }
                 }
             }
 
@@ -271,7 +279,7 @@ router.get("/dash", isLoggedIn, function(req,res){
                         'totalBoxes' : agg[0]['boxesSold']
                     }
                 };
-            }
+            } 
 
             finished();
         }
