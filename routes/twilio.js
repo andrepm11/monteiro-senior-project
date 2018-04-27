@@ -34,195 +34,9 @@ var io = app.io;
 var slackPost = require("../slackPost.js");
 
 
-router.post("/slack", function(req,res){
-	if(req.body){
-		if(req.body.event.type){
-			console.log(req.body.event);
-			if(req.body.event.type == 'message'){
-				TextCustomer.findOne({slackChannel:req.body.event.channel}, function(err,found){
-					if(err){
-						console.log(err);
-					} else {
-						if(found){
-							if(req.body.event.subtype){
-								// console.log(req.body.event.file);
-								if(req.body.event.subtype == 'file_share' && !req.body.event.file.is_public){
-									web.files.sharedPublicURL(req.body.event.file.id, function(err,file){
-										if(err){
-											console.log(err);
-										} else{
-
-											var firstPart = file.file.url_private;
-											var secret = file.file.permalink_public;
-
-											// console.log(file.file);
-
-											// client.messages.create({
-											// 	to: found.phone,
-											// 	from: '+14159158372',
-											// 	mediaUrl: firstPart+'?pub_secret='+secret.slice(secret.lastIndexOf("-") + 1),
-											// });
-											// var time = new Date();
-											// var message = firstPart+'?pub_secret='+secret.slice(secret.lastIndexOf("-") + 1);
-											// found.chat.push({
-											// 	message : message,
-											// 	sender : 'Verb',
-											// 	timestamp : time
-											// });
-											// found.save();
-
-											client.messages.create({
-				                                  to:found.phone,
-				                                  from:'+14159158372',
-				                                  mediaUrl: firstPart+'?pub_secret='+secret.slice(secret.lastIndexOf("-") + 1),
-				                                  statusCallback: 'https://dash.verbenergybar.com/twilioCallBack',
-				                              }, function(err,message){
-				                                  if(err){
-				                                      console.log('ERROR - Sending slack text');
-				                                      console.log('Phone: '+found.phone);
-				                                      console.log(err);
-				                                  } else{
-				                                      found.chat.push({
-				                                          message : firstPart+'?pub_secret='+secret.slice(secret.lastIndexOf("-") + 1),
-				                                          sender : 'Verb',
-				                                          timestamp : new Date(),
-				                                          messageID : message.sid,
-				                                          status : 'pending'
-				                                      });
-				                                      found.save();
-				                                  }
-				                              });
-
-										}
-									});
-
-								} else if(req.body.event.subtype == 'file_share'){
-
-									var file = req.body.event.file;
-									var firstPart = file.url_private;
-									var secret = file.permalink_public;
-
-									// console.log(file.file);
-									client.messages.create({
-		                                  to:found.phone,
-		                                  from:'+14159158372',
-		                                  mediaUrl: firstPart+'?pub_secret='+secret.slice(secret.lastIndexOf("-") + 1),
-		                                  statusCallback: 'https://dash.verbenergybar.com/twilioCallBack',
-		                              }, function(err,message){
-		                                  if(err){
-		                                      console.log('ERROR - Sending slack text');
-		                                      console.log('Phone: '+found.phone);
-		                                      console.log(err);
-		                                  } else{
-		                                      found.chat.push({
-		                                          message : firstPart+'?pub_secret='+secret.slice(secret.lastIndexOf("-") + 1),
-		                                          sender : 'Verb',
-		                                          timestamp : new Date(),
-		                                          messageID : message.sid,
-		                                          status : 'pending'
-		                                      });
-		                                      found.save();
-		                                  }
-		                              });
-
-									// client.messages.create({
-									// 	to: found.phone,
-									// 	from: '+14159158372',
-									// 	mediaUrl: firstPart+'?pub_secret='+secret.slice(secret.lastIndexOf("-") + 1),
-									// });
-									// var time = new Date();
-									// var message = firstPart+'?pub_secret='+secret.slice(secret.lastIndexOf("-") + 1);
-									// found.chat.push({
-									// 	message : message,
-									// 	sender : 'Verb',
-									// 	timestamp : time
-									// });
-									// found.save();
-
-								}
-							} else {
-								var regex = /:(.+?):/g;
-								var messageBody = req.body.event.text.replace(regex, function(match,capture){
-									return emoji.get(match);
-								});
 
 
-								client.messages.create({
-	                                  body:messageBody,
-	                                  to:found.phone,
-	                                  from:'+14159158372',
-	                                  statusCallback: 'https://dash.verbenergybar.com/twilioCallBack',
-	                              }, function(err,message){
-	                                  if(err){
-	                                      console.log('ERROR - Sending slack text');
-	                                      console.log('Phone: '+found.phone);
-	                                      console.log(err);
-	                                  } else{
-	                                      found.chat.push({
-	                                          message : messageBody,
-	                                          sender : 'Verb',
-	                                          timestamp : new Date(),
-	                                          messageID : message.sid,
-	                                          status : 'pending'
-	                                      });
-	                                      found.save();
-	                                  }
-	                              });
-								// var time = new Date();
-								// found.chat.push({
-								// 	message : message,
-								// 	sender : 'Verb',
-								// 	timestamp : time
-								// });
 
-								// console.log('Message being sent is: '+message);
-
-								// client.messages.create({
-								// 	body:message,
-								// 	to:found.phone,
-								// 	from:'+14159158372'
-								// });
-								// found.save();
-							}
-						} else{
-							//This will happen if we want to text someone that has never texted us 
-						}
-					}
-				});
-			}
-		}
-
-		res.sendStatus(200);
-		
-	} else {
-		res.sendStatus(200);
-	}
-
-	
-})
-
-router.post("/twilioCall", function(req,res){
-	// const VoiceResponse = twilio.twiml.VoiceResponse;
-
-	// const twiml = new VoiceResponse();
-
-	const twiml = new twilio.twiml.VoiceResponse();
-
-	twiml.play({
-	    loop: 1
-	}, 'https://dash.verbenergybar.com/voicemail.mp3');
-
-
-	res.header('Content-Type', 'text/xml');
-  	res.send(twiml.toString());
-
-	client.messages.create({
-		body:'Call from '+req.body.From,
-		to:'+17863008768',
-		from:'+14159158372'
-	});
-
-});
 
 router.post("/phoneredirect", function(req,res){
 	console.log(req.body.Body);
@@ -332,7 +146,7 @@ router.post("/twilio", function(req,res){
                                 } else {
                                 	created.chat.push({
 										message : firstReply,
-										sender : 'Verb',
+										sender : 'Company',
 										timestamp : new Date(),
 										messageID : message.sid,
 										status : 'pending'
@@ -370,92 +184,28 @@ router.post("/twilio", function(req,res){
 
 					found.save();
 
-					var payload = {
-						token : process.env.SLACKTOKEN,
-						channel : found.slackChannel,
-						text : "",
-						attachments : JSON.stringify([{title:"",image_url:req.body.MediaUrl0}]),
-						as_user : false,
-						icon_url : 'https://cdn2.iconfinder.com/data/icons/perfect-flat-icons-2/512/User_man_male_profile_account_person_people.png',
-						username : found.firstName +' ' + found.lastName
-					};
-
-					slackPost('chat.postMessage', [payload]);
-
-
 
 				} else {
-					web.groups.create(req.body.From, function(err,res){
-					// web.channels.create(req.body.From, function(err,res){
-						if(err){
-							console.log(err);
-						} else {
-							var finished = _.after(3, channelsCreated);
+		
 
-							web.groups.invite(res.group.id,process.env.ISAACSLACK, function(error,res){
-							// web.channels.invite(res.channel.id,process.env.ISAACSLACK, function(error,res){
-								if(err){
-									console.log(err);
-								} else {
-									finished();
-								}
-							});
-
-							web.groups.invite(res.group.id,process.env.MATTSLACK, function(error,res){
-							// web.channels.invite(res.channel.id,process.env.MATTSLACK, function(error,res){
-								if(err){
-									console.log(err);
-								} else {
-									finished();
-								}
-							});
-
-							web.groups.invite(res.group.id,process.env.BENNETTSLACK, function(error,res){
-							// web.channels.invite(res.channel.id,process.env.BENNETTSLACK, function(error,res){
-								if(err){
-									console.log(err);
-								} else {
-									finished();
-								}
-							});
-
-							function channelsCreated(){
-
-
-								var payload = {
-									token : process.env.SLACKTOKEN,
-									// channel : res.channel.id,
-									channel : res.group.id,
-									text : "",
-									attachments : JSON.stringify([{title:"",image_url:req.body.MediaUrl0}]),
-									as_user : false,
-									icon_url : 'https://cdn2.iconfinder.com/data/icons/perfect-flat-icons-2/512/User_man_male_profile_account_person_people.png',
-									username : 'Customer'
-								};
-
-								slackPost('chat.postMessage', [payload]);
-
-								TextCustomer.create({
-									phone : req.body.From,
-									// slackChannel : res.channel.id,
-									slackChannel : res.group.id,
-									firstName: 'Customer',
-									lastName: '',
-									chat : [
-										{
-											message : req.body.MediaUrl0,
-											sender : 'Customer',
-											timestamp : time
-										}
-									],
-									totalOrders : 0,
-    								totalValue : 0,
-    								created : new Date()
-								});
+					TextCustomer.create({
+						phone : req.body.From,
+						firstName: 'Customer',
+						lastName: '',
+						chat : [
+							{
+								message : req.body.MediaUrl0,
+								sender : 'Customer',
+								timestamp : new Date(),
+								status : 'unread'
 							}
-						}
+						],
+						totalOrders : 0,
+						totalValue : 0,
+						created : new Date(),
+						lastInteraction : new Date()
 					});
-
+							
 				}
 			}
 		});
