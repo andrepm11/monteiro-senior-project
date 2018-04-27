@@ -48,7 +48,7 @@ module.exports = function(io){
                   var timestamp = new Date();
                     customer.chat.push({
                         message : data.message,
-                        sender : 'Verb',
+                        sender : 'Company',
                         timestamp : timestamp,
                         messageID : message.sid,
                         status : 'pending'
@@ -56,7 +56,7 @@ module.exports = function(io){
                     customer.lastInteraction = timestamp;
                     customer.save();
                     // console.log('Sent to '+firstName+' '+lastName+' and saved '+customer.firstName+' '+customer.lastName);
-                    data.sender = 'verb'
+                    data.sender = 'company'
                     data.timestamp = timestamp;
                     data.firstName = customer.firstName;
                     data.lastName = customer.lastName;

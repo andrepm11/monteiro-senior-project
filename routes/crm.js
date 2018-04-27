@@ -289,25 +289,7 @@ router.get("/lastInteraction", function(req,res){
     res.sendStatus(200);
 });
 
-router.get("/notificationtest", function(req,res){
 
-  var msg = {
-    message: "Hey can I get some more bars?",
-    title: "Andre Monteiro (786) 300-8768",
-    url: "https://dash.verbenergybar.com/crm?phone=7863008768",
-    url_title: "Andre Monteiro"
-  }
-
-  p.send( msg, function( err, result ) {
-    if ( err ) {
-      throw err
-    }
-
-    console.log( result )
-  });
-
-  res.sendStatus(200);
-});
 
 
 router.post("/updateinfo", function(req,res){
