@@ -13,10 +13,10 @@
 			<div class="col-12 message-timestamp active-timestamp mt-3 mb-3 text-center text-muted">
 			</div>
 			<div class="col-12" data-timestamp="<%= message.timestamp %>">
-				<% if(message.sender == 'Verb'){ %>
+				<% if(message.sender == 'Company'){ %>
 					
 					<% if(message.status == 'failed'){ %>
-					<div class="text-bubble verb-text not-delivered">
+					<div class="text-bubble company-text not-delivered">
 						<% if(message.mediaURL){ %>
 							<img class="thumbnail" src="<%=message.mediaURL%>">
 						<% } else { %>
@@ -24,7 +24,7 @@
 						<% } %>
 					</div>
 					<% } else { %>
-					<div class="text-bubble verb-text">
+					<div class="text-bubble company-text">
 						<% if(message.mediaURL){ %>
 							<img class="thumbnail" src="<%=message.mediaURL%>">
 						<% } else { %>
@@ -32,7 +32,7 @@
 						<% } %>
 					</div>
 					<% } %>
-					<div class="collapse verb-timestamp text-muted">
+					<div class="collapse company-timestamp text-muted">
 						<%= message.timestamp %> - <%= message.status%>
 					</div>
 				<% } else { %>

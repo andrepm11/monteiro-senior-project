@@ -97,7 +97,7 @@ body {
 
 }
 
-.verb-text {
+.company-text {
 	position:relative;
 	padding:10px 20px;
 	/*color:white; */
@@ -108,30 +108,6 @@ body {
 	max-width: 60%;
 	margin-right:0.8em;
 }
-/*.verb-text::before {
-	content:"";
-	position:absolute;
-	z-index:-1;
-	bottom:-2px;
-	right:-7px;
-	height:20px;
-	border-right:20px solid rgb(242, 199, 92);
-	border-bottom-left-radius: 16px 14px;
-	-webkit-transform:translate(0, -2px);
-}
-
-.verb-text::after {
-	content:"";
-	position:absolute;
-	z-index:1;
-	bottom:-2px;
-	right:-56px;
-	width:26px;
-	height:20px;
-	background:rgb(251, 249, 238);
-	border-bottom-left-radius: 10px;
-	-webkit-transform:translate(-30px, -2px);
-}*/
 
 .not-delivered {
 	background-color:gray;
@@ -141,7 +117,7 @@ body {
 	border-right:20px solid gray;
 }
 
-.verb-timestamp {
+.company-timestamp {
 	clear: both;
 	float:right;
 	font-size:0.6em;

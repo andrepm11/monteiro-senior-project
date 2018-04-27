@@ -1,9 +1,5 @@
-var stripeTestKey = process.env.STRIPETEST; 
-var stripeLiveKey = process.env.STRIPELIVE; 
-
 var express = require("express");
 var router = express.Router();
-// var mongoose    = require("mongoose")
 var db = require('../db.js');
 var _  = require("underscore");
 
@@ -15,8 +11,6 @@ var TextOrder = models.TextOrder;
 var isLoggedIn = require("../isLoggedIn.js");
 
 // var stripe = require("stripe")(stripeTestKey);
-var stripe = require("stripe")(stripeLiveKey);
-
 
 var accountSid = process.env.twilioSID;
 var authToken = process.env.twilioAUTH; 
@@ -27,16 +21,6 @@ var MessagingResponse = require('twilio').twiml.MessagingResponse;
 var slackPost = require("../slackPost.js");
 
 var moment = require('moment');
-
-
-// var Pushover = require('node-pushover');
-
-// var push = new Pushover({
-//     token: process.env.PUSHOVERAPIKEY,
-//     user: process.env.ANDREPUSHOVERKEY
-//   });
-
-
 
 router.get("/crm", isLoggedIn, function(req,res){
 
