@@ -329,7 +329,7 @@ router.get("/textcustomers/:id", isLoggedIn, function(req,res){
             console.log(err);
         } else{
             if(found){
-                res.render("dashboard/textcustomerPage", {found:found, loadQuant:loadQuant, price:pricing['oc-box']});
+                res.render("dashboard/textcustomerPage", {found:found, loadQuant:loadQuant, price:20});
             } else{
                 res.redirect("/404");
             }
