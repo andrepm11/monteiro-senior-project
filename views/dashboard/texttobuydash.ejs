@@ -24,9 +24,6 @@
 			<span>Total Orders: <strong><%= dashboardData['totalOrders'] %></strong></span>
 		</div>
 		<div class="text-left">
-			<span>Bars Per Order: <strong><%= dashboardData['barsPerOrder'].toFixed(2) %></strong></span>
-		</div>
-		<div class="text-left">
 			<span>Texts Per Order: <strong><%= dashboardData['textsPerOrderAll'].toFixed(2) %> (~$ <%= (dashboardData['textsPerOrderAll']*0.0075).toFixed(2) %>)</strong></span>
 		</div>
 
@@ -36,21 +33,6 @@
 		</div>
 		<div class="text-left" style="margin-bottom:1em;">
 			<span>Total Revenue: <strong><%= (dashboardData['monthlystats']['trial']['revenue']+dashboardData['monthlystats']['full']['revenue']).toFixed(2) %></strong></span>
-		</div>
-		<div class="text-left">
-			<span>Full Orders: <strong><%= dashboardData['monthlystats']['full']['count'] %></strong></span>
-		</div>
-		<div class="text-left" style="margin-bottom:1em;">
-			<span>Full Revenue: <strong><%= dashboardData['monthlystats']['full']['revenue'].toFixed(2) %></strong></span>
-		</div>
-		<div class="text-left">
-			<span>Trial Orders: <strong><%= dashboardData['monthlystats']['trial']['count'] %></strong></span>
-		</div>
-		<div class="text-left" style="margin-bottom:1em;">
-			<span>Trial Revenue: <strong><%= dashboardData['monthlystats']['trial']['revenue'].toFixed(2) %></strong></span>
-		</div>
-		<div class="text-left">
-			<span>Total Boxes: <strong><%= dashboardData['monthlystats']['full']['totalBoxes'] %></strong></span>
 		</div>
 		
 		<div style="width:100%;">

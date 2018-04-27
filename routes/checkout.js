@@ -821,7 +821,7 @@ router.post("/reorder", function(req,res){
                   
                   var totalQuantity = 0;
                   var totalPrice = 0;
-                  req.session.items.forEach(function(item){
+                  req.body.items.forEach(function(item){
                       totalQuantity += item.quantity;
                       totalPrice += item.price*item.quantity;
                   });

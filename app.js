@@ -108,7 +108,7 @@ app.post('/signup', passport.authenticate('local-signup', {
 }));
 
 app.get("*", function(req,res){
-    res.render("404");
+    res.render("index");
 });
 
 http.listen(process.env.PORT,process.env.IP,function(){
