@@ -1,0 +1,25 @@
+<% found.forEach(function(message){ %>
+	<div class="row ml-0 mr-0">
+		<div class="col-12 message-timestamp active-timestamp mt-3 mb-3 text-center text-muted">
+		</div>
+		<div class="col-12" data-timestamp="<%= message.chat.timestamp %>">
+			<% if(message.chat.sender == 'Verb'){ %>
+				
+				<div class="text-bubble verb-text">
+					<%= message.chat.message %>
+				</div>
+				<div class="collapse verb-timestamp text-muted">
+					<%= message.chat.timestamp %>
+				</div>
+			<% } else { %>
+				<div class="text-bubble customer-text">
+					<%= message.chat.message %>
+				</div>
+				<div class="collapse customer-timestamp text-muted">
+					<%= message.chat.timestamp %>
+				</div>
+			<% } %>
+				
+		</div>
+	</div>
+<% }); %>

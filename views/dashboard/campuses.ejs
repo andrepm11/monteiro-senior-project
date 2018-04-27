@@ -1,0 +1,10 @@
+<% include partials/header %>
+
+
+<% campuses.forEach(function(campus){ %>
+	<div class="row">
+		<a href="/campuspickup?campus=<%= campus %>"><%= campus %></a>
+	</div>
+<% }); %>
+
+<% include partials/footer %>

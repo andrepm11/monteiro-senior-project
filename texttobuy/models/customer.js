@@ -2,7 +2,6 @@ var db = require('../../db.js');
 
 var textCustomerSchema = new db.Schema({
     phone : String,
-    slackChannel : String,
     chat : [
         {
             message : String,

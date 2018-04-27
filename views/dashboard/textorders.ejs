@@ -1,0 +1,39 @@
+<% include partials/header %>
+
+<div class="row">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-8">
+        <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Invoice Number</th>
+                <th></th>
+                <th>Name</th>
+                <th>Customer Phone</th>
+                <th>Completion Date</th>
+                <th>School</th>
+                <th>Paid</th>
+              </tr>
+            </thead>
+            <tbody>
+                <% found.forEach(function(order){ %>
+                    <tr>
+                        <td><a href="/textOrders/<%= order.invoiceNumber %>"><%= order.invoiceNumber %></a></td>
+                        <td><% if(order.refund.length > 0){ %>refunded<%}%></td>
+                        <td><%= order.firstName +' '+order.lastName%></td>
+                        <td><a href="/textCustomers/<%= order.customerPhone %>"><%= order.customerPhone %></a></td>
+                        <td><%= String(order.completionDate).substring(4,15) %></td>
+                        <td><%= order.school %></td>
+                        <td><%= order.paid %></td>
+                    </tr>
+                <% });%>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-sm-2"></div>
+</div>
+
+
+
+
+<% include partials/footer %>

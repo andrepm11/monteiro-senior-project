@@ -1,0 +1,263 @@
+<% include partials/header %>
+
+
+<div class="container">
+    <header class="jumbotron">
+        <div class="container">
+            <h2>Key Performance Indicators</h2>
+        </div>
+    </header>
+</div>
+<div class="jumbotron">
+  <div class="container text-center">
+    <h1>Graph placeholder</h1>      
+  </div>
+</div>
+
+<div class="container-fluid bg-3 text-center">    
+  <h3>General Stats</h3><br>
+  <div class="row">
+        <div class="col-sm-2" style="width:20.83333325%"></div>
+        
+        <div class="col-sm-3 tile">
+            <p class="tile-title">Price Per Bar</p>
+            <div class="tile-content">
+                $<%= pricePerBar.toFixed(3) %>
+            </div>
+        </div>
+        <div class="col-sm-1"></div>
+        <div class="col-sm-3 tile">
+            <p class="tile-title">Customers Subscribed</p>
+            <div class="tile-content">
+                <%= (subscribedCustomers*100 / (repeatCustomers+oneTimeCustomers+newCustomersThisMonth)).toFixed(2) %>%
+            </div>
+        </div>
+        <div class="col-sm-3" style="width:20.83333325%"></div>
+
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-sm-1" style="width:4.16666665%;"></div>
+    <div class="col-sm-3 tile">
+        <p class="tile-title">New Customers</p>
+        <div class="tile-content">
+            <%= newCustomersThisMonth %> <span>this month</span>
+            <br>
+            <%= newCustomersThisMonth+oneTimeCustomers+repeatCustomers %> <span>all time</span>
+        </div>
+    </div>
+    <div class="col-sm-1"></div>
+    <div class="col-sm-3 tile"> 
+        <p class="tile-title">One-Time Customers</p>
+        <div class="tile-content">
+            <%= oneTimeCustomers %>
+            <br>
+            <%= (oneTimeCustomers*100 / (oneTimeCustomers+repeatCustomers)).toFixed(2) %>%
+        </div>
+    </div>
+    <div class="col-sm-1"></div>
+    <div class="col-sm-3 tile"> 
+        <p class="tile-title">Repeat Customers</p>
+        <div class="tile-content">
+            <%= repeatCustomers %>
+            <br>
+            <%= (repeatCustomers*100 / (oneTimeCustomers+repeatCustomers)).toFixed(2) %>%
+        </div>
+    </div>
+    <div class="col-sm-1" style="width:4.16666665%;"></div>
+  </div>
+</div>
+
+<div class="container-fluid bg-3 text-center">    
+  <h3>Subscriptions</h3><br>
+  <div class="row">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-2 tile">
+        <p class="tile-title">Active Subscriptions</p>
+        <div class="tile-content">
+            <%= activeSubs %>
+        </div>
+    </div>
+    <div class="col-sm-1"></div>
+    <div class="col-sm-2 tile"> 
+        <p class="tile-title">New Subs This Month</p>
+        <div class="tile-content">
+            <%= newSubsThisMonth %>
+        </div>
+    </div>
+    <div class="col-sm-1"></div>
+    <div class="col-sm-2 tile"> 
+        <p class="tile-title">Canceled This Month</p>
+        <div class="tile-content">
+            <%= canceledSubsThisMonth %>
+        </div>
+    </div>
+    <div class="col-sm-2"></div>
+  </div>
+  <br>
+  <div class="row">
+        <div class="col-sm-3" style="width:29.1666666%"></div>
+        
+        <div class="col-sm-2 tile">
+            <p class="tile-title">Churn</p>
+            <div class="tile-content">
+                <%= (canceledSubsThisMonth / newSubsThisMonth).toFixed(3) %>
+            </div>
+        </div>
+        <div class="col-sm-1"></div>
+        <div class="col-sm-2 tile">
+            <p class="tile-title">LTV</p>
+            <div class="tile-content">
+                <%= (avgSpentCombined / (canceledSubsThisMonth / newSubsThisMonth)).toFixed(2) %>
+            </div>
+        </div>
+        <div class="col-sm-3" style="width:29.1666666%"></div>
+
+  </div>
+</div>
+<br>
+
+
+<div class="container-fluid bg-3 text-center">    
+  <h3>Orders This Month</h3><br>
+  <div class="row">
+    <div class="col-sm-1" style="width:12.499999%;"></div>
+    <div class="col-sm-4 tile">
+        <p class="tile-title">One-Time Orders This Month</p>
+        <div class="tile-content">
+            <%= onetimeOrdersThisMonth %>
+            <br>
+            $<%= onetimeEarnedThisMonth.toFixed(2) %>
+        </div>
+    </div>
+    <div class="col-sm-1"></div>
+    <div class="col-sm-4 tile"> 
+        <p class="tile-title">Subscription Orders This Month</p>
+        <div class="tile-content">
+            <%= subOrdersThisMonth %>
+            <br>
+            $<%= subEarnedThisMonth.toFixed(2) %>
+        </div>
+    </div>
+    <div class="col-sm-1" style="width:12.499999%;"></div>
+  </div>
+  <br>
+  <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-4 tile">
+            <p class="tile-title">Combined This Month</p>
+            <div class="tile-content">
+                <%= (subOrdersThisMonth+onetimeOrdersThisMonth) %>
+                <br>
+                $<%= (subEarnedThisMonth+onetimeEarnedThisMonth).toFixed(2) %>
+            </div>
+        </div>
+        <div class="col-sm-4"></div>
+
+  </div>
+</div>
+<br>
+<div class="container-fluid bg-3 text-center">    
+  <h3>Orders All Time</h3><br>
+  <div class="row">
+    <div class="col-sm-1" style="width:12.499999%;"></div>
+    <div class="col-sm-4 tile">
+        <p class="tile-title">One-Time Orders All Time</p>
+        <div class="tile-content">
+            <%= onetimeOrdersAllTime %>
+            <br>
+            $<%= onetimeEarnedAllTime.toFixed(2) %>
+        </div>
+    </div>
+    <div class="col-sm-1"></div>
+    <div class="col-sm-4 tile"> 
+        <p class="tile-title">Subscription Orders All Time</p>
+        <div class="tile-content">
+            <%= subOrdersAllTime %>
+            <br>
+            $<%= subEarnedAllTime.toFixed(2) %>
+        </div>
+    </div>
+    <div class="col-sm-1" style="width:12.499999%;"></div>
+  </div>
+  <br>
+  <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-4 tile">
+            <p class="tile-title">Combined All Time</p>
+            <div class="tile-content">
+                <%= (subOrdersAllTime+onetimeOrdersAllTime) %>
+                <br>
+                $<%= (subEarnedAllTime+onetimeEarnedAllTime).toFixed(2) %>
+            </div>
+        </div>
+        <div class="col-sm-4"></div>
+
+  </div>
+</div>
+<br>
+<div class="container-fluid bg-3 text-center">    
+  <h3>Averages Per Subscriber</h3><br>
+  <div class="row">
+    <div class="col-sm-1" style="width:12.499999%;"></div>
+    <div class="col-sm-4 tile">
+        <p class="tile-title">Exclude Offices</p>
+        <div class="tile-content">
+            <%= (avgBPSnoOffice*10).toFixed(1) %> bars
+            <br>
+            $<%= avgSpentNoOffice.toFixed(2) %>
+        </div>
+    </div>
+    <div class="col-sm-1"></div>
+    <div class="col-sm-4 tile"> 
+        <p class="tile-title">Offices</p>
+        <div class="tile-content">
+            <%= (avgBPSoffice*10).toFixed(1) %> bars
+            <br>
+            $<%= avgSpentOffice.toFixed(2) %>
+        </div>
+    </div>
+    <div class="col-sm-1" style="width:12.499999%;"></div>
+  </div>
+  <br>
+  <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-4 tile">
+            <p class="tile-title">Combined</p>
+            <div class="tile-content">
+                <%= (avgBPScombined*10).toFixed(1) %> bars
+                <br>
+                $<%= avgSpentCombined.toFixed(2) %>
+            </div>
+        </div>
+        <div class="col-sm-4"></div>
+
+  </div>
+</div>
+<br>
+<div class="container-fluid bg-3 text-center">    
+  <h3>Office Orders</h3><br>
+  <div class="row">
+    <div class="col-sm-1" style="width:12.499999%;"></div>
+    <div class="col-sm-4 tile">
+        <p class="tile-title">This Month</p>
+        <div class="tile-content">
+            <%= officeOrdersThisMonth %> orders
+            <br>
+            $<%= officeEarnedThisMonth.toFixed(2) %>
+        </div>
+    </div>
+    <div class="col-sm-1"></div>
+    <div class="col-sm-4 tile"> 
+        <p class="tile-title">All Time</p>
+        <div class="tile-content">
+            <%= totalOfficeOrders %> orders
+            <br>
+            $<%= totalOfficeEarned.toFixed(2) %>
+        </div>
+    </div>
+    <div class="col-sm-1" style="width:12.499999%;"></div>
+  </div>
+</div>
+<br>
+<% include partials/footer %>

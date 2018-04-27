@@ -1,0 +1,269 @@
+
+	<div id="info-sidebar">
+		<div class="row">
+			<div class="col-12">
+				<button type="button" style="width:100%" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+				    <div class="row pl-0 pr-0 sidebar-btn">
+				    	<div class="col-7 text-left">	
+						      <span class="mb-0">Place Order &or;</span>
+						</div>
+				    </div>
+			    </button>
+				<div id="collapseFive" class="collapse pb-3">
+					<form id="reorder">
+							<div class="row mb-1">
+								<div class="col-12 mb-2">
+									<div class="btn btn-primary w-100 sc-button">Simply Cocoa</div>
+								</div>
+								<div class="col-6">
+									<div class="form-group form-inline">
+										<label for="sc-quantity">Q: </label>
+										<input class="cart-quant form-control w-75 ml-1" id="sc-quantity" name="sc-quantity" data-id="sc-pouch" data-name="Simply Cocoa (Pouch of 12)" type="number" required value=1 min="0" onchange="cartTotal(this);">
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="form-group form-inline">
+										<label for="sc-price">$ </label>
+										<input class="cart-price form-control w-75 ml-1" id="sc-price" name="sc-price" type="number" required value=20 min="0.01" max="25.00" step="any" onchange="cartTotal(this);">
+									</div>
+								</div>
+								<div class="col-12">
+									<p class="cart-subtotal" id="sc-total">Total: $20</p>
+								</div>
+							</div>
+							<div class="row mb-1">
+								<div class="col-12 mb-2">
+									<div class="btn btn-primary w-100 mb-button">Maple Blueberry</div>
+								</div>
+								<div class="col-6">
+									<div class="form-group form-inline">
+										<label for="mb-quantity">Q: </label>
+										<input class="cart-quant form-control w-75 ml-1" id="mb-quantity" name="mb-quantity" data-id="mb-pouch" data-name="Maple Blueberry (Pouch of 12)" type="number" required value=0 min="0" onchange="cartTotal(this);">
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="form-group form-inline">
+										<label for="mb-price">$ </label>
+										<input class="cart-price form-control w-75 ml-1" id="mb-price" name="mb-price" type="number" required value=20 min="0.01" max="25.00" step="any" onchange="cartTotal(this);">
+									</div>
+								</div>
+								<div class="col-12">
+									<p class="cart-subtotal" id="mb-total">Total: $0</p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-12 mb-2">
+									<div class="btn btn-primary w-100 pb-button">Salted Peanut Butter</div>
+								</div>
+								<div class="col-6">
+									<div class="form-group form-inline">
+										<label for="pb-quantity">Q: </label>
+										<input class="cart-quant form-control w-75 ml-1" id="pb-quantity" name="pb-quantity" data-id="pb-pouch" data-name="Salted Peanut Butter (Pouch of 12)" type="number" required value=0 min="0" onchange="cartTotal(this);">
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="form-group form-inline">
+										<label for="pb-price">$ </label>
+										<input class="cart-price form-control w-75 ml-1" id="pb-price" name="pb-price" type="number" required value=20 min="0.01" max="25.00" step="any" onchange="cartTotal(this);">
+									</div>
+								</div>
+								<div class="col-12">
+									<p class="cart-subtotal" id="pb-total">Total: $0</p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-12 text-right">
+									<h6 id="cart-total">Cart Total: $20</h6>
+								</div>
+							</div>
+
+		                    <h6 class="text-left">Shipping</h6>
+		                    <div>
+		                        <label for="shipping">Campus</label>
+		                        <input name="shipping" class="shipping" type="radio" value="campus" onClick="shippingMethod(this);">
+		                    </div>
+
+		                    <div id="campus" class="shipping-input" style="display:none;">
+		                        <select
+		                            required
+		                            class="form-control"
+		                            id="school"
+		                            name="school"
+		                            >
+		                            <option value="Yale">Yale</option>
+		                        </select>
+		                    </div>
+		                    <div>
+		                        <label for="shipping">Ground Shipping</label>
+		                        <input name="shipping" class="shipping" type="radio" required value="ground" checked="checked" onClick="shippingMethod(this);">
+		                    </div>
+		                    <div id="ground" class="shipping-input">
+		                        <div>
+		                            <label for="firstName">First Name</label>
+		                            <input class="form-control" id="firstName" name="firstName" type="text" value="<%= found.firstName %>">
+		                        </div>
+		                        <div>
+		                            <label for="lastName">Last Name</label>
+		                            <input class="form-control" id="lastName" name="lastName" type="text" value="<%= found.lastName %>">
+		                        </div>
+		                        <div>
+		                            <label for="address1">Address</label>
+		                            <input id="address1" name="address1" class="form-control" type="text" placeholder="185 Berry St" value="<%= found.address.shippingAddress.address1 %>">
+		                        </div>
+		                        <div>
+		                            <label for="address2">Secondary Address</label>
+		                            <input id="address2" name="address2" class="form-control" type="text" placeholder="Apt 2" value="<%= found.address.shippingAddress.address2 %>">
+		                        </div>
+		                        <div>
+		                            <label for="city">City</label>
+		                            <input id="city" name="city" class="form-control" type="text" placeholder="New York" value="<%= found.address.shippingAddress.city %>">
+		                        </div>
+		                        <div>
+		                            <label for="state">State</label>
+		                            <input id="state" name="state" class="form-control" type="text" placeholder="NY" value="<%= found.address.shippingAddress.state %>">
+		                        </div>
+		                        <div>
+		                            <label for="zip">Zip Code</label>
+		                            <input id="zip" name="zip" class="form-control" type="text" placeholder="10001" value="<%= found.address.shippingAddress.zip %>">
+		                        </div>
+		                    </div>
+		                    <input id="hidden-shipping" style="display:none;" value="ground">
+
+		                    <h3 class="text-left" id="total-price">Total: $20</h3>
+
+		                    <button type="submit" class="btn btn-primary btn-active">Submit</button>                    
+
+		                </form>
+				</div>
+				<button type="button" style="width:100%" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+				    <div class="row pl-0 pr-0 sidebar-btn" id="statisticsBtn">
+				    	<div class="col-7 text-left">	
+						      <span id="statisticsBtnText" class="mb-0">Customer Data &or;</span>
+						</div>
+				    </div>
+			    </button>
+			    <div id="collapseOne" class="collapse">
+					<p class="mb-0">Total orders: <%=found.totalOrders%></p> 
+					<p class="mb-0">Total value: $<%=found.totalValue%></p> 
+					<% found.orders.forEach(function(order){ %>
+						<a target="_blank" href="/textorders/<%=order.invoiceNumber%>"><p class="mb-0"><%= order.invoiceNumber%></p></a>
+					<% }); %>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12">
+				<button type="button" style="width:100%" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+				    <div class="row pl-0 pr-0 sidebar-btn">
+				    	<div class="col-7 text-left">	
+						      <span class="mb-0">Personal Information &or;</span>
+						</div>
+				    </div>
+			    </button>
+			     <div id="collapseTwo" class="collapse">
+				<form id="personal-info">
+					<div class="row pb-2">
+						<div class="col-6 pr-1">
+							<input class="form-control hidden-input" readonly name="firstName" value="<%= found.firstName%>">
+						</div>
+						<div class="col-6 pl-1">
+							<input class="form-control hidden-input" readonly name="lastName" value="<%= found.lastName%>">
+						</div>
+					</div>
+					<div class="row pb-2">
+						<div class="col-12">
+							<input class="form-control hidden-input" id="phone" readonly name="phone" value="<%= found.phone%>">
+						</div>
+					</div>
+					<div class="row pb-2">
+						<div class="col-12">
+							<input class="form-control hidden-input" readonly name="email" value="<%= found.email%>">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12 text-right">
+							<button type="button" class="btn btn-primary mt-1 edit-sidebar w-50">Edit</button>
+						</div>
+					</div>
+				</form>
+				</div>
+				<button type="button" style="width:100%" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+				    <div class="row pl-0 pr-0 sidebar-btn">
+				    	<div class="col-7 text-left">	
+						      <span class="mb-0">Shipping Information &or;</span>
+						</div>
+				    </div>
+			    </button>
+				<div id="collapseThree" class="collapse">
+				<form id="shipping-method">
+					<div class="row pb-2">
+						<div class="col-12">
+							<input class="form-control hidden-input" readonly name="address1" value="<%= found.address.shippingAddress.address1%>" placeholder="69 Lake Pl">
+						</div>
+					</div>
+					<div class="row pb-2">
+						<div class="col-12">
+							<input class="form-control hidden-input" readonly name="address2" value="<%= found.address.shippingAddress.address2%>" placeholder="Ste. 2">
+						</div>
+					</div>
+					<div class="row pb-2">
+						<div class="col-12">
+							<input class="form-control hidden-input" readonly name="city" value="<%= found.address.shippingAddress.city%>" placeholder="Boot City">
+						</div>
+					</div>
+					<div class="row pb-2">
+						<div class="col-6 pr-1">
+							<input class="form-control hidden-input" readonly name="state" value="<%= found.address.shippingAddress.state%>" placeholder="ID">
+						</div>
+						<div class="col-6 pl-1">
+							<input class="form-control hidden-input" readonly name="zip" value="<%= found.address.shippingAddress.zip%>" placeholder="33186">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12 text-right">
+							<button type="button" class="btn btn-primary mt-1 edit-sidebar w-50">Edit</button>
+						</div>
+					</div>
+				</form>
+				</div>
+				<button type="button" style="width:100%" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+				    <div class="row pl-0 pr-0 sidebar-btn">
+				    	<div class="col-7 text-left">	
+						      <span class="mb-0">Card Information &or;</span>
+						</div>
+				    </div>
+			    </button>
+				<div id="collapseFour" class="collapse">
+					<div class="row">
+						<div class="col-12">
+							<p class="mb-0"><%= found.card.brand %> <%= found.card.last4 %></p>
+							<p><%= found.card.exp_month %>/<%= found.card.exp_year %></p>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<button type="button" class="btn btn-primary edit-card w-50">Edit</button>
+						</div>
+					</div>
+				</div>
+				<div class="row mb-1">
+					<div class="col-12 text-right">
+						<% if(!found.flagged){ %>
+							<button onClick="setflag('flagged', true)" type="button" class="btn btn-success">Flag</button>
+						<% } else { %>
+							<button onClick="setflag('flagged', false)" type="button" class="btn btn-success">Unflag</button>
+						<% } %>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12 text-right">
+						<% if(!found.dontText){ %>
+							<button onClick="setflag('dontText',true)" type="button" class="btn btn-danger">Do Not Text</button>
+						<% } else { %>
+							<button onClick="setflag('dontText',false)" type="button" class="btn btn-success">Remove from No-Text List</button>
+						<% } %>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>

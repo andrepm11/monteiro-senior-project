@@ -497,9 +497,9 @@ router.post("/cart/web-charge", function(req,res){
                                 } else{
                                     if(order){
                                         var number = parseInt(order.invoiceNumber.substr(3))+1;
-                                        var newOrder = 'VRB'+number.toString();
+                                        var newOrder = 'OSHT'+number.toString();
                                     } else{
-                                        var newOrder = 'VRB1000';
+                                        var newOrder = 'OSHT1000';
                                     }
                                     stripe.charges.create({
                                         amount : Math.round(totalPrice*100),
@@ -629,9 +629,9 @@ router.post("/cart/web-charge", function(req,res){
                             } else{
                                 if(order){
                                     var number = parseInt(order.invoiceNumber.substr(3))+1;
-                                    var newOrder = 'VRB'+number.toString();
+                                    var newOrder = 'OSHT'+number.toString();
                                 } else{
-                                    var newOrder = 'VRB1000';
+                                    var newOrder = 'OSHT1000';
                                 }
                             
                                 var customerId = customer.id;
@@ -818,9 +818,9 @@ router.post("/reorder", function(req,res){
                       } else {
                           if(order){
                               var number = parseInt(order.invoiceNumber.substr(3))+1;
-                              var newOrder = 'VRB'+number.toString();
+                              var newOrder = 'OSHT'+number.toString();
                           } else {
-                              var newOrder = 'VRB1000';
+                              var newOrder = 'OSHT1000';
                           }
                           var price = req.body.price;
                           stripe.charges.create({

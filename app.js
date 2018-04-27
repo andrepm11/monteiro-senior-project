@@ -80,7 +80,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/login', function(req, res) {
-    res.render('login', { message: req.flash('loginMessage') }); 
+    res.render('dashboard/login', { message: req.flash('loginMessage') }); 
 });
 
 app.post('/login', passport.authenticate('local-login',{
@@ -98,7 +98,7 @@ app.post('/login', passport.authenticate('local-login',{
 app.get('/signup', function(req, res) {
 
     // render the page and pass in any flash data if it exists
-    res.render('signup', { message: req.flash('signupMessage') });
+    res.render('dashboard/signup', { message: req.flash('signupMessage') });
 });
 
 app.post('/signup', passport.authenticate('local-signup', {

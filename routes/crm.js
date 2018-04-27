@@ -218,8 +218,8 @@ router.get("/crm-chat", function(req,res){
        TextCustomer.findOne({'phone':req.query.phone},
         {
           'firstName':1,'lastName':1,'chat':{$slice:-10},'totalValue':1,'totalOrders':1,
-          'phone':1,'customerId':1,'email':1,'created':1,'orders':1,'address':1,'card':1,'flexPlans':1,'dontText':1,'flagged':1
-        }).populate('flexPlans').exec(function(err,found){
+          'phone':1,'customerId':1,'email':1,'created':1,'orders':1,'address':1,'card':1,'dontText':1,'flagged':1
+        }).exec(function(err,found){
         if(err){
           console.log('CRM ERROR 4');
           console.log(err);

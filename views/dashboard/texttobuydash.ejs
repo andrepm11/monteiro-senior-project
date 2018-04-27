@@ -1,0 +1,404 @@
+<% include partials/header %>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+
+
+
+
+
+
+
+<div class="row">
+	<div class="well col-md-4 col-md-offset-1">
+		<h3>Campuses</h3>
+		<% dashboardData.campuses.forEach(function(campus){ %>
+			<% if(campus == 'Ground'){ %>
+				<div class="row">
+					<a href="/webfulfillment"><%= campus %></a>
+				</div>
+			<% } else { %>
+				<div class="row">
+					<a href="/campuspickup?campus=<%= campus %>"><%= campus %></a>
+				</div>
+			<% } %>
+		<% }); %>
+	</div>
+	<div class="well col-md-5 col-md-offset-1">
+		<h3><a href="/textorders">All Text Orders</a></h3>
+		<h3><a href="/textcustomers">All Text Customers</a></h3>
+		
+	</div>
+
+
+</div>
+<div class="well">
+    	<h3 class="text-left">Metrics</h3>
+		<div class="text-left">
+			<span>Total People Who've Texted: <strong><%= dashboardData['totalCustomers'] %></strong></span>
+		</div>
+		<div class="text-left">
+			<span>Total People Who've Bought: <strong><%= dashboardData['boughtCustomers'] %> (<%= (dashboardData['boughtCustomers']/dashboardData['totalCustomers']*100).toFixed(2) %>%)</strong></span>
+		</div>
+		<div class="text-left">
+			<span>Total Orders: <strong><%= dashboardData['totalOrders'] %></strong></span>
+		</div>
+		<div class="text-left">
+			<span>Bars Per Order: <strong><%= dashboardData['barsPerOrder'].toFixed(2) %></strong></span>
+		</div>
+		<div class="text-left">
+			<span>Texts Per Order: <strong><%= dashboardData['textsPerOrderAll'].toFixed(2) %> (~$ <%= (dashboardData['textsPerOrderAll']*0.0075).toFixed(2) %>)</strong></span>
+		</div>
+
+		<h3 class="text-left">This Month</h3>
+		<div class="text-left">
+			<span>Total Orders: <strong><%= (dashboardData['monthlystats']['full']['count']+dashboardData['monthlystats']['trial']['count']) %></strong></span>
+		</div>
+		<div class="text-left" style="margin-bottom:1em;">
+			<span>Total Revenue: <strong><%= (dashboardData['monthlystats']['trial']['revenue']+dashboardData['monthlystats']['full']['revenue']).toFixed(2) %></strong></span>
+		</div>
+		<div class="text-left">
+			<span>Full Orders: <strong><%= dashboardData['monthlystats']['full']['count'] %></strong></span>
+		</div>
+		<div class="text-left" style="margin-bottom:1em;">
+			<span>Full Revenue: <strong><%= dashboardData['monthlystats']['full']['revenue'].toFixed(2) %></strong></span>
+		</div>
+		<div class="text-left">
+			<span>Trial Orders: <strong><%= dashboardData['monthlystats']['trial']['count'] %></strong></span>
+		</div>
+		<div class="text-left" style="margin-bottom:1em;">
+			<span>Trial Revenue: <strong><%= dashboardData['monthlystats']['trial']['revenue'].toFixed(2) %></strong></span>
+		</div>
+		<div class="text-left">
+			<span>Total Boxes: <strong><%= dashboardData['monthlystats']['full']['totalBoxes'] %></strong></span>
+		</div>
+		
+		<div style="width:100%;">
+			<h2>Revenue Since Beginning</h2>
+			<canvas id="daily-revenue" width="400" height="400"></canvas>
+		</div>
+		<div style="width:100%;">
+			<h2>Orders Since Beginning</h2>
+			<canvas id="daily-orders" width="400" height="400"></canvas>
+		</div>	
+		<script>
+
+			var daily = <%-JSON.stringify(graph.daily)%>
+			var ctx = document.getElementById("daily-revenue").getContext('2d');
+			// ctx.canvas.width = 100;
+			ctx.canvas.height = 500;
+			var myChart = new Chart(ctx, {
+			    type: 'line',
+			    data: {
+			        labels: [<% Object.keys(graph.daily).forEach(function(key){ %> 
+						moment('<%= key %>','YYYY-MM-DD').format("MMM D YY"),
+						<% }); %>],
+			        datasets: [{
+				      label: 'Full Order Revenue',
+				      yAxisID: 'B',
+				      data: [<% Object.keys(graph.daily).forEach(function(key){ %> 
+				      		daily['<%=key%>']['fullcustomer']['revenue'], 
+						<% }); %>],
+				      borderColor: [
+			                'rgba(63, 191, 63, 1)'
+			            ],
+			            borderWidth: 1
+				    },{
+				      label: 'Trial Revenue',
+				      yAxisID: 'B',
+				      data: [<% Object.keys(graph.daily).forEach(function(key){ %> 
+				      		daily['<%=key%>']['trial']['revenue'], 
+						<% }); %>],
+				      borderColor: [
+			                'rgba(239, 119, 0, 1)'
+			            ],
+			            borderWidth: 1
+				    },{
+				      label: 'Total Revenue',
+				      yAxisID: 'B',
+				      data: [<% Object.keys(graph.daily).forEach(function(key){ %> 
+				      		daily['<%=key%>']['trial']['revenue']+daily['<%=key%>']['fullcustomer']['revenue'], 
+						<% }); %>],
+				      borderColor: [
+			                'rgba(14, 14, 230, 1)'
+			            ],
+			            borderWidth: 1
+				    }]
+			    },
+			    options: {
+					scales: {
+					  xAxes: [{
+					    type: 'time',
+					    time: {
+					      unit:'day',
+					      displayFormats: {
+					      	'millisecond': 'MMM DD',
+					        'second': 'MMM DD',
+					        'minute': 'MMM DD',
+					        'hour': 'MMM DD',
+					        'day': 'MMM DD',
+					        'week': 'MMM DD',
+					        'month': 'MMM DD',
+					        'quarter': 'MMM DD',
+					        'year': 'MMM DD',
+					      },
+					    },
+					    ticks: {
+					        autoSkip: true,
+					        maxTicksLimit: 10
+					    }
+					  }],
+					  yAxes: [{
+				        id: 'B',
+				        type: 'linear',
+				        position: 'both',
+				      }, {
+				        id: 'B',
+				        type: 'linear',
+				        position: 'right'
+				      }]
+					},
+					responsive: true,
+			        maintainAspectRatio: false
+				}
+			});
+			var dailyorders = document.getElementById("daily-orders").getContext('2d');
+			// ctx.canvas.width = 100;
+			dailyorders.canvas.height = 500;
+			var myChart = new Chart(dailyorders, {
+			    type: 'line',
+			    data: {
+			        labels: [<% Object.keys(graph.daily).forEach(function(key){ %> 
+						moment('<%= key %>','YYYY-MM-DD').format("MMM D YY"),
+						<% }); %>],
+			        datasets: [{
+				      label: 'Full Order# of Orders',
+				      yAxisID: 'A',
+				      data: [<% Object.keys(graph.daily).forEach(function(key){ %> 
+							daily['<%=key%>']['fullcustomer']['count'], 
+						<% }); %>],
+				      borderColor: [
+			                'rgba(63, 191, 63, 1)'
+			            ],
+			            borderWidth: 1
+				    },{
+				      label: 'Trial # of Orders',
+				      yAxisID: 'A',
+				      data: [<% Object.keys(graph.daily).forEach(function(key){ %> 
+							daily['<%=key%>']['trial']['count'], 
+						<% }); %>],
+				      borderColor: [
+			                'rgba(239, 119, 0, 1)'
+			            ],
+			            borderWidth: 1
+				    },{
+				      label: 'Total # of Orders',
+				      yAxisID: 'A',
+				      data: [<% Object.keys(graph.daily).forEach(function(key){ %> 
+							daily['<%=key%>']['trial']['count']+daily['<%=key%>']['fullcustomer']['count'], 
+						<% }); %>],
+				      borderColor: [
+			                'rgba(14, 14, 230, 1)'
+			            ],
+			            borderWidth: 1
+				    }]
+			    },
+			    options: {
+					scales: {
+					  xAxes: [{
+					    type: 'time',
+					    time: {
+					      unit:'day',
+					      displayFormats: {
+					      	'millisecond': 'MMM DD',
+					        'second': 'MMM DD',
+					        'minute': 'MMM DD',
+					        'hour': 'MMM DD',
+					        'day': 'MMM DD',
+					        'week': 'MMM DD',
+					        'month': 'MMM DD',
+					        'quarter': 'MMM DD',
+					        'year': 'MMM DD',
+					      },
+					    },
+					    ticks: {
+					        autoSkip: true,
+					        maxTicksLimit: 10
+					    }
+					  }],
+					  yAxes: [{
+				        id: 'A',
+				        type: 'linear',
+				        position: 'left',
+				        ticks: {
+				        	suggestedMax: 100
+				        }
+				      }]
+					},
+					responsive: true,
+			        maintainAspectRatio: false
+				}
+			});
+			</script>
+
+		</div>
+		<div style="width:100%;">
+		<h2>Orders by Size</h2>
+			<canvas id="myChart" width="400" height="400"></canvas>
+			<script>
+			var ctx = document.getElementById("myChart").getContext('2d');
+			// ctx.canvas.width = 100;
+			ctx.canvas.height = 500;
+			var myChart = new Chart(ctx, {
+			    type: 'bar',
+			    data: {
+			        labels: [<% Object.keys(graph.values).forEach(function(key){ %> 
+						<%= key %>, 
+						<% }); %>],
+			        datasets: [{
+			            label: '# of Orders',
+			            data: [<% Object.keys(graph.values).forEach(function(key){ %> 
+							<%= graph.values[key] %>, 
+						<% }); %>],
+			            backgroundColor: [
+			                'rgba(255, 99, 132, 0.2)',
+			                'rgba(54, 162, 235, 0.2)',
+			                'rgba(255, 206, 86, 0.2)',
+			                'rgba(75, 192, 192, 0.2)',
+			                'rgba(153, 102, 255, 0.2)',
+			                'rgba(255, 159, 64, 0.2)'
+			            ],
+			            borderColor: [
+			                'rgba(255,99,132,1)',
+			                'rgba(54, 162, 235, 1)',
+			                'rgba(255, 206, 86, 1)',
+			                'rgba(75, 192, 192, 1)',
+			                'rgba(153, 102, 255, 1)',
+			                'rgba(255, 159, 64, 1)'
+			            ],
+			            borderWidth: 1
+			        }]
+			    },
+			    options: {
+			        scales: {
+			            yAxes: [{
+			                ticks: {
+			                    beginAtZero:true
+			                }
+			            }]
+			        },
+			        responsive: true,
+			        maintainAspectRatio: false
+			    }
+			});
+			</script>
+
+		</div>
+		<div style="width:100%;">
+			<h2>Orders by Hour</h2>
+			<canvas id="hours" width="400" height="400"></canvas>
+			<script>
+			var ctx = document.getElementById("hours").getContext('2d');
+			// ctx.canvas.width = 100;
+			ctx.canvas.height = 500;
+			var myChart = new Chart(ctx, {
+			    type: 'line',
+			    data: {
+			        labels: [<% Object.keys(graph.hours).forEach(function(key){ %> 
+						<%= key %>, 
+						<% }); %>],
+			        datasets: [{
+			            label: '# of Orders',
+			            data: [<% Object.keys(graph.hours).forEach(function(key){ %> 
+							<%= graph.hours[key] %>, 
+						<% }); %>],
+			            backgroundColor: [
+			                'rgba(255, 99, 132, 0.2)',
+			                'rgba(54, 162, 235, 0.2)',
+			                'rgba(255, 206, 86, 0.2)',
+			                'rgba(75, 192, 192, 0.2)',
+			                'rgba(153, 102, 255, 0.2)',
+			                'rgba(255, 159, 64, 0.2)'
+			            ],
+			            borderColor: [
+			                'rgba(255,99,132,1)',
+			                'rgba(54, 162, 235, 1)',
+			                'rgba(255, 206, 86, 1)',
+			                'rgba(75, 192, 192, 1)',
+			                'rgba(153, 102, 255, 1)',
+			                'rgba(255, 159, 64, 1)'
+			            ],
+			            borderWidth: 1
+			        }]
+			    },
+			    options: {
+			        scales: {
+			            yAxes: [{
+			                ticks: {
+			                    beginAtZero:true
+			                }
+			            }]
+			        },
+			        responsive: true,
+			        maintainAspectRatio: false
+			    }
+			});
+			</script>
+
+		</div>
+		<div style="width:100%;">
+			<h2>Orders by Day of the Week</h2>
+			<canvas id="days" width="400" height="400"></canvas>
+			<script>
+			var ctx = document.getElementById("days").getContext('2d');
+			// ctx.canvas.width = 100;
+			ctx.canvas.height = 500;
+			var myChart = new Chart(ctx, {
+			    type: 'line',
+			    data: {
+			        labels: [<% Object.keys(graph.days).forEach(function(key){ %> 
+						'<%= key %>', 
+						<% }); %>],
+			        datasets: [{
+			            label: '# of Orders',
+			            data: [<% Object.keys(graph.days).forEach(function(key){ %> 
+							<%= graph.days[key] %>, 
+						<% }); %>],
+			            backgroundColor: [
+			                'rgba(255, 99, 132, 0.2)',
+			                'rgba(54, 162, 235, 0.2)',
+			                'rgba(255, 206, 86, 0.2)',
+			                'rgba(75, 192, 192, 0.2)',
+			                'rgba(153, 102, 255, 0.2)',
+			                'rgba(255, 159, 64, 0.2)'
+			            ],
+			            borderColor: [
+			                'rgba(255,99,132,1)',
+			                'rgba(54, 162, 235, 1)',
+			                'rgba(255, 206, 86, 1)',
+			                'rgba(75, 192, 192, 1)',
+			                'rgba(153, 102, 255, 1)',
+			                'rgba(255, 159, 64, 1)'
+			            ],
+			            borderWidth: 1
+			        }]
+			    },
+			    options: {
+			        scales: {
+			            yAxes: [{
+			                ticks: {
+			                    beginAtZero:true
+			                }
+			            }]
+			        },
+			        responsive: true,
+			        maintainAspectRatio: false
+			    }
+			});
+			</script>
+
+		</div>
+		
+</div>
+
+<% include partials/footer %>

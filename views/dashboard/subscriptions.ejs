@@ -1,0 +1,110 @@
+<% include partials/header %>
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+
+<script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+<a href="/addSub">Manually add subscription</a>
+<div class="container">
+    <div class="left-align">
+        <form action="/subinfo" method="POST">
+            <div class="form-group">
+                <label>Plan</label>
+                <input class="col-10" type="text" name="plan" placeholder="20 Bar" value="<%= plan %>">
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <input class="col-10" type="text" name="status" placeholder="Active" value="<%= status %>">
+            </div>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" name="name" placeholder="Matthew Tsarnecki" value="<%= name %>">
+            </div>
+            <div class="form-group">
+                <label>E-mail</label>
+                <input type="text" name="email" placeholder="fishingboy69@aol.com" value="<%= email %>">
+            </div>
+            <div class="form-group">
+                <label>Date</label> <br>
+                <input type="radio" name="dateType" value="Range" checked="checked"> Between <br>
+                <input type="radio" name="dateType" value="Before"> Before <br>
+                <input type="radio" name="dateType" value="After"> After <br>
+                <p><input type="text" name="datefilter" value="" ></p>
+            </div>
+            <div class="form-group">
+                <input type="submit">
+            </div>
+            
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    function datePicker(radioButton) {
+
+        singleDateBool = false;
+        if(radioButton != 'Range'){
+            singleDateBool = true;
+        }
+
+      $('input[name="datefilter"]').daterangepicker({
+          autoUpdateInput: true,
+          singleDatePicker: singleDateBool,
+          locale: {
+              cancelLabel: 'Clear'
+          }
+      });
+
+      $('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
+          $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+      });
+
+      $('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
+          $(this).val('');
+      });
+
+    }
+
+    $(document).ready(function(){
+        datePicker($('input[name="dateType"]:checked').val());
+        $("input[name='dateType']").click(function(){
+            $('input[name="datefilter"]').val('');
+            datePicker($('input[name="dateType"]:checked').val());
+        });
+    });
+</script>
+<div class="row">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-8">
+        <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Plan</th>
+                <th>Status</th>
+                <th>Starts On</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Amount</th>
+                <th>Total Spent</th>
+              </tr>
+            </thead>
+            <tbody>
+                <% found.forEach(function(subscription){ %>
+                    <tr>
+                        <td><a href="/subscriptions/<%=subscription.subscriptionId%>"><%= subscription.plan.name %></a></td>
+                        <td><%= subscription.status %></td>
+                        <td><%= String(subscription.startsOn).substring(4,15)%></td>
+                        <td><%= subscription.user.billingAddress.name %></td>
+                        <td><%= subscription.user.email %></td>
+                        <td>$<%= subscription.plan.totalAmount%></td>
+                        <td>$<%= subscription.totalSpent %></td>
+                    </tr>
+                <% });%>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-sm-2"></div>
+</div>
+
+
+
+
+<% include partials/footer %>

@@ -1,0 +1,770 @@
+<% include partials/header %>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+<script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+	
+
+	<div class="loader" id="loading-indicator" style="display:none;"></div>
+
+	<div class="container-fluid">
+
+		<div class="row ">
+			<div class="col-lg-2 col-12 left-panel">
+				<div class="row panel-header pt-2 pt-lg-3 pb-3">
+					<div class="col-12">
+						<h4 class="text-center">Conversations</h4>
+					</div>
+					<div class="col-8 col-lg-12">
+						<div class="row">
+							<div class="col-4 p-1">
+								<button type="button" class="conversation-filter w-100 btn btn-primary active-button btn-sm" data-query="false">All</button>
+							</div>
+							<div class="col-4 p-1">
+								<button type="button" class="conversation-filter w-100 btn btn-primary btn-sm" data-query="true">Unread</button>
+							</div>
+							<div class="col-4 p-1">
+								<button type="button" class="conversation-filter w-100 btn btn-primary btn-sm" data-query="flagged">Flagged</button>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-lg-12 pt-3">
+								<input id="conversation-search" name="search" class="w-100 form-control" type="text" placeholder="Search">
+							</div>
+						</div>
+						<div class="row">
+							<div class="offset-3 col-6">
+								<button type="button" onClick="scrollUp();" class="w-100 btn btn-sm btn-link p-0">Scroll Up</button>
+							</div>
+						</div>
+					</div>
+					<div class="col-4 d-lg-none text-center">
+						<button type="button" class="btn btn-primary p-3 user-conversation"><i data-feather="user"></i></button>
+					</div>
+				</div>
+				<div id="conversation-list" class="panel-body row">
+				<% found.forEach(function(customer){ %>
+					<!-- <div class="row"> -->
+						<% if(customer.waitingOnResponse){ %>
+						<div id="<%=customer.phone%>" class="col-12 chat-preview unread-conversation" data-phone="<%=customer.phone%>">
+						<% } else { %>
+						<div id="<%=customer.phone%>" class="col-12 chat-preview" data-phone="<%=customer.phone%>">
+						<% } %>
+							<span class="name mb-0"><%= customer.firstName %> <%= customer.lastName%></span> <span class="conversation-timestamp"><%= moment(customer.chat[0].timestamp).fromNow() %></span>
+							<p class="text-peek"><%= customer.chat[0].message %></p>
+						</div>
+					<!-- </div> -->
+				<% }); %>
+				</div>
+			</div>
+			<div class="middle-panel col-lg-7 col-12 d-none d-lg-block">
+				<div class="row panel-header pt-2 pt-lg-3 pb-3">
+					<div class="col-3 d-lg-none text-center">
+						<button id="inbox" type="button" class="btn btn-primary p-3"><i data-feather="inbox"></i></button>
+					</div>
+					<div class="col-6 active-conversation">
+						<h5>Name</h5>
+						<h6>Phone</h6>
+					</div>
+					<div class="col-3 d-lg-none text-center">
+						<button id="right-sidebar-open" type="button" class="btn btn-primary p-3"><i data-feather="align-right"></i></button>
+					</div>
+				</div>
+				<div class="row">
+					<div id="conversation">
+						<h5>&larr; Click a conversation over there</h5>
+					</div>
+				</div>
+			</div>
+			<div class="right-panel col-lg-3 col-12 d-none d-lg-block">
+				<div class="row panel-header pt-2 pt-lg-3 pb-3">
+					<div class="col-4 d-lg-none text-center">
+						<button type="button" class="btn btn-primary p-3 user-conversation"><i data-feather="user"></i></button>
+					</div>
+					<div class="col-8 col-lg-12">
+							<h4>User Info</h4>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12" id="right-sidebar">
+						<h5>Click a conversation</h5>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+
+	<script>
+
+
+		var skip = 0;
+		var conversationSkip = 100;
+		var searchTerm='';
+
+		function bindChatPreview(){
+			$('.chat-preview').on('click',function(evt){
+
+				$('.chat-preview').removeClass('active-preview');
+				$(this).addClass('active-preview');
+				
+				var url='/crm-chat?phone='+$(this).data('phone');
+				var name = $($(this).children()[0]).text();
+				var phone = $(this).data('phone').toString();
+				var prettyPhone = '('+phone.substring(0,3)+') '+phone.substring(3,6)+'-'+phone.substring(6,10);
+				$(this).removeClass('unread-conversation');
+				
+				$.ajax({ 
+					type: 'GET', 
+					url: url,
+					dataType: 'html', 
+					success: function(data){ 
+						if (history.pushState) {
+					    var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?phone='+phone;
+					    window.history.pushState({path:newurl},'',newurl);
+					}
+						socket.off('chat message');
+						data = JSON.parse(data);
+						$('#conversation').html(data['html']);
+						$('#right-sidebar').html(data['sidebar']);
+						var date = $('.starteddate').text();
+						$('.moment-replace').each(function(item){
+							var replaceSelector = $($('.moment-replace')[item]);
+							replaceSelector.text(moment(new Date(replaceSelector.text())).format('MM/DD/YYYY'));
+						});
+						
+						var htmlstring = '<h4 id="active-name">'+name+'</h4><h5 id="active-phone" data-phone="'+phone+'">'+prettyPhone+'</h5>';
+						$('.active-conversation').html(htmlstring);
+						$('.left-panel').addClass('d-none d-lg-block');
+						$('.middle-panel').removeClass('d-none');
+						var outerHeights = $('.message-input').outerHeight()+$('.middle-panel .panel-header').outerHeight();
+		    
+   						$('#conversation-body').css('height',$(window).height() - outerHeights);
+
+
+						var conversation = $('#conversation-body');
+						var height = conversation[0].scrollHeight;
+
+						$('#new-message').focus();
+						skip=10;
+						$('#conversation-body').scrollTop(height);
+						bindConversation();
+						bindSidebarForms();
+
+
+						timeStamps();
+
+					}
+				});
+			});
+		}
+
+		bindChatPreview();
+
+
+		function bindSidebarForms(){
+
+			bindEditSidebar();
+			bindSaveSidebar();
+			bindEditCard();
+			bindReorderSubmit();
+
+		}
+
+		function bindEditSidebar(){
+			$('.edit-sidebar').on('click', function(){
+				var form = $(this).parents('form:first');
+				$('.hidden-input').attr('readonly',false);
+				var input = $(form[0][0]);
+				input.focus();
+				var tmpStr = input.val();
+				input.val('');
+				input.val(tmpStr);
+
+				$('.edit-sidebar').text('Save');
+				$('.edit-sidebar').addClass('save-sidebar');
+				$('.save-sidebar').removeClass('edit-sidebar').off('click');;
+
+				bindSaveSidebar();
+			});
+		}
+
+		function bindEditCard(){
+			$('.edit-card').on('click', function(){
+				$('#new-message').text('You can edit your payment info here: https://www.verbenergybar.com/updatepayment?phone='+$('#active-phone').data('phone'));
+			});
+		}
+
+		function bindSaveSidebar(){
+			$('.save-sidebar').on('click', function(){
+				var data = $('#personal-info').serializeArray().reduce(function(obj, item) {
+				    obj[item.name] = item.value;
+				    return obj;
+				}, {});
+
+				data['address'] = {'shippingAddress':{}};
+				$('#shipping-method').serializeArray().forEach(function(item){
+					data['address']['shippingAddress'][item.name] = item.value;
+				});
+
+				$('.hidden-input').attr('readonly',true);
+				$('.save-sidebar').text('Edit');
+				$('.save-sidebar').addClass('edit-sidebar');
+				$('.edit-sidebar').removeClass('save-sidebar').off('click');;
+				bindEditSidebar();
+				$.ajax({
+			        url: '/updateinfo',
+			        type: "POST",
+			        dataType: "json",
+			        data: JSON.stringify(data),
+			        contentType: "application/json",
+			        cache: false,
+			        timeout: 5000,
+			        complete: function() {
+			        //called when complete
+			            // $('#loading-indicator').hide();
+			        },
+			        success: function(data) {
+			            if(data.result == 'success'){
+			                console.log('Info update success!');
+			            } else {
+			                alert(data.error);
+			            }
+			        },
+			        error: function() {
+			        	console.log('error');
+			        }
+			    });
+
+			});
+		}
+
+		function bindReorderSubmit(){
+			$('#reorder').on('submit', function(evt){
+			    evt.preventDefault();
+
+			    var url = "/cart/set-session";
+			    var data = {
+			        "firstName": $('#firstName').val(),
+			        "lastName": $('#lastName').val(),
+			        "phone" : $('#phone').val(),
+			        "shipping" : $('#hidden-shipping').val(),
+			        "school" : $('#school').val(),
+			        "address1" : $('#address1').val(),
+			        "address2" : $('#address2').val(),
+			        "city" : $('#city').val(),
+			        "state" : $('#state').val(),
+			        "zip" : $('#zip').val(),
+			    };
+
+			    var quants = $('.cart-quant');
+				var prices = $('.cart-price');
+				var sc = $(quants[0]).val()*$(prices[0]).val();
+				var mb = $(quants[1]).val()*$(prices[1]).val();
+				var pb = $(quants[2]).val()*$(prices[2]).val();
+
+				// console.log(data);
+				data.items = [];
+				for(var i=0;i<3;i++){
+					if($(quants[i]).val()>0){
+						data.items.push({
+							'id' : $(quants[i]).data('id'),
+					        'name' : $(quants[i]).data('name'),
+					        'quantity' : $(quants[i]).val(),
+					        'price' : $(prices[i]).val(),
+					        'totalPrice' : $(quants[i]).val()*$(prices[i]).val()});
+					}
+				}
+
+			    // data.items = [{
+			    //     'id' : 'oc-box',
+			    //     'name' : 'Oats and Cocoa (Box of 10)',
+			    //     'quantity' : $(quants[0]).val(),
+			    //     'price' : $(prices[0]).val(),
+			    //     'totalPrice' : $(quants[0]).val()*$(prices[0]).val()
+			    // }];
+
+			    console.log(data);
+
+			    // $('#loading-indicator').show();
+
+			    // $.ajax({
+			    //     url: '/reorder',
+			    //     type: "POST",
+			    //     dataType: "json",
+			    //     data: JSON.stringify(data),
+			    //     contentType: "application/json",
+			    //     cache: false,
+			    //     timeout: 5000,
+			    //     complete: function() {
+			    //     //called when complete
+			    //         // $('#loading-indicator').hide();
+			    //     },
+			    //     success: function(data) {
+			    //         if(data.result == 'success'){
+			    //             alert('Success!');
+			    //             $('#loading-indicator').hide();
+			    //         } else {
+			    //             alert(data.error);
+			    //             $('#loading-indicator').hide();
+			    //         }
+			    //     },
+			    //     error: function() {
+			    //         alert('Error');
+			    //         $('#loading-indicator').hide();
+
+			    //     }
+			    // });
+			    // cartPost(url, data, partial(cartButton,$('#information-form')));
+			    
+			    return false;
+			});
+		}
+
+		function bindConversation(){         
+			$('#conversation-body').scroll(function(){
+			    if ($('#conversation-body').scrollTop() == 0){
+			        var url='/crm-chat?skip='+skip+'&phone='+$('#active-phone').data('phone');
+			        $.ajax({ 
+						type: 'GET', 
+						url: url,
+						dataType: 'html', 
+						success: function(data){ 
+							if(data == 'None'){
+								$('#conversation-body').off('scroll');
+							} else {
+								var oldHeight = $('#conversation-body')[0].scrollHeight;
+								$('#conversation-body').prepend(data); 
+
+								var conversation = $('#conversation-body');
+								var newHeight = $('#conversation-body')[0].scrollHeight;
+								conversation.scrollTop(newHeight-oldHeight);
+								skip+=10;
+								timeStamps();
+								$('.text-bubble').click(function(event){
+									$($(this).next()).collapse('toggle');
+								});
+
+							}
+						}
+					});
+			    }
+			});
+
+			$('.text-bubble').click(function(event){
+				$($(this).next()).collapse('toggle');
+			});
+
+		}
+
+
+
+		$('#conversation-list').scroll(function(){
+
+		    if ($('#conversation-list').scrollTop() >= $('#conversation-list')[0].scrollHeight-$('#conversation-list').height()-2){
+		        var url='/load-conversations?conversationSkip='+conversationSkip+'&search='+searchTerm;
+		        $.ajax({ 
+					type: 'GET', 
+					url: url,
+					dataType: 'html', 
+					success: function(data){ 
+						if(data == 'None'){
+							console.log('None');
+						} else {
+							$('.chat-preview').off('click');
+
+							$('#conversation-list').append(data); 
+							bindChatPreview();
+							conversationSkip+=100;
+						}
+					}
+				});
+		    }
+		});
+
+
+		function timeStamps(){
+			var date = '';
+			$('.active-timestamp').each(function(idx){
+				var isodate = new Date($(this).next().data('timestamp')).toISOString();
+				var messageDate = moment(isodate).format("MMM Do YYYY");
+				if(messageDate != date){
+					date = messageDate;
+					$(this).text(messageDate);
+				} else {
+					$(this).removeClass('active-timestamp');
+				}
+			});
+		}
+
+
+		$('.conversation-filter').on('click', function(){
+			$('.conversation-filter').removeClass('active-button');
+			$(this).addClass('active-button');
+
+
+			var query = $(this).data('query');
+			var url='/conversationfilter?query='+query;
+			$.ajax({ 
+				type: 'GET', 
+				url: url,
+				dataType: 'html', 
+				success: function(data){ 
+					$('#conversation-list').html(data); 
+					bindChatPreview();
+					conversationSkip=100;
+				}
+			});
+
+			//TO DO
+			//Replace conversation list with query, grab query info from data of $(this)
+		});
+
+		function searchTimeoutFunction() {  
+			typing = false;
+			// send search
+			searchTerm = $('#conversation-search').val();
+			var url='/load-conversations?conversationSkip=0&search='+searchTerm;
+	        $.ajax({ 
+				type: 'GET', 
+				url: url,
+				dataType: 'html', 
+				success: function(data){ 
+					if(data == 'None'){
+						console.log('None');
+					} else {
+						// $('.chat-preview').off('click');
+						conversationSkip=0;
+						$('#conversation-list').html(data); 
+						bindChatPreview();
+						conversationSkip+=100;
+					}
+				}
+			});
+		}
+		var searchTimeout = undefined;
+
+		$("#conversation-search").keypress(function (e) {
+			if (searchTimeout) { clearTimeout(searchTimeout) }
+		    if (e.which !== 13) {
+		        typing = true; // we know the user is typing because they have pressed a key but not 'Enter'
+
+		        // socket.emit("typing", {user:$('#active-user').text(), conversation:$('#active-phone').data('phone')});
+		        // clearTimeout(timeout);
+		        searchTimeout = setTimeout(searchTimeoutFunction, 700);
+		    } else {
+		        // clearTimeout(timeout); // no need to fire the timeoutFunction twice (as we do it on the next line)
+		        searchTimeoutFunction(); // probably needs a better name but this will immediately send the necessary `socket.emit('typing', false)` when the enter key is pressed
+		    }
+		    
+		});
+
+		$('.user-conversation').on('click', function(e){
+			$('.left-panel').addClass('d-none d-lg-block');
+			$('.right-panel').addClass('d-none');
+			$('.middle-panel').removeClass('d-none');
+		});
+		$('#inbox').on('click', function(e){
+			// $('.left-panel').css('display','none');
+			$('.left-panel').removeClass('d-none');
+			$('.middle-panel').addClass('d-none');
+		});
+		$('#right-sidebar-open').on('click', function(e){
+			// $('.left-panel').css('display','none');
+			$('.right-panel').removeClass('d-none');
+			$('.middle-panel').addClass('d-none');
+			var outerHeight = $('.right-panel .panel-header').outerHeight();
+   			$('#right-sidebar').css('height',$(window).height() - outerHeight);
+
+		});
+
+		feather.replace();
+
+		if(<%=loadCustomer%>){
+			var topPos = $('#<%=loadCustomer%>').offset().top;
+			$('#conversation-list').scrollTop(topPos - 200);
+			$('#<%=loadCustomer%>').click();
+		}
+
+
+		function shippingMethod(obj){
+
+		    $('.shipping-input').css('display','none');
+
+		    $('#'+$(obj).val()).css('display','block');
+
+		    $('#hidden-shipping').val($(obj).val());
+
+		}
+
+		function totalPrice(){
+
+		    $('#total-price').html('Total: $'+($('#quantity').val()*$('#price').val()).toString());
+		}
+
+		
+		$(window).resize(function(){
+			
+		    var outerHeights = $('.message-input').outerHeight()+$('.middle-panel .panel-header').outerHeight();
+		    
+		    $('#conversation-body').css('height',$(window).height() - outerHeights);
+		});
+
+		function cartTotal(object){
+			var quants = $('.cart-quant');
+			var prices = $('.cart-price');
+			var oc = $(quants[0]).val()*$(prices[0]).val();
+			var mb = $(quants[1]).val()*$(prices[1]).val();
+			var pb = $(quants[2]).val()*$(prices[2]).val();
+			$('#sc-total').text('Total: $'+(oc));
+			$('#mb-total').text('Total: $'+(mb));
+			$('#pb-total').text('Total: $'+(pb));
+			$('#cart-total').text('Total: $'+(oc+mb+pb));
+		}
+		function flexcartTotal(object){
+			var quants = $('.flex-cart-quant');
+			var prices = $('.flex-cart-price');
+			var oc = $(quants[0]).val()*$(prices[0]).val();
+			var mb = $(quants[1]).val()*$(prices[1]).val();
+			var pb = $(quants[2]).val()*$(prices[2]).val();
+
+			var priceList = {};
+
+			var prices = $('.flex-cart-price');
+			$('.flex-cart-quant').each(function(i){
+				priceList[$($('.flex-cart-quant')[i]).data('initials')] = $($('.flex-cart-quant')[i]).val()*$(prices[i]).val();
+			});
+			$('#sc-flex-total').text('Total: $'+(priceList['sc']));
+			$('#mb-flex-total').text('Total: $'+(priceList['mb']));
+			$('#pb-flex-total').text('Total: $'+(priceList['pb']));
+			$('#flex-cart-total').text('Total: $'+(priceList['sc']+priceList['mb']+priceList['pb']));
+		}
+
+		function flexButton(button){
+			var active = $(button).data('active');
+			var inactive = $(button).data('inactive');
+			
+
+			$('#'+active).css('display','none');
+			$('#'+inactive).css('display','block');
+
+
+			$(button).data('active',inactive);
+			$(button).data('inactive',active);
+			var active = $(button).data('active');
+			var inactive = $(button).data('inactive');
+			$(button).text(inactive);
+
+		}
+
+		function editFlexPlan(button){
+
+			if($(button).data('action') == 'edit'){
+				$(button).data('action', 'save');
+				$(button).text('Save');
+				var idx = $(button).data('index');
+				var ids = {
+					'sc-pouch':{
+						'id':'sc-pouch',
+						'name' : 'Simply Cocoa',
+						'initials':'sc'
+					},
+					'mb-pouch':{
+						'id':'mb-pouch',
+						'name' : 'Maple Blueberry',
+						'initials':'mb'
+					},
+					'pb-pouch':{
+						'id':'pb-pouch',
+						'name' : 'Salted Peanut Butter',
+						'initials':'pb'
+					}
+				};
+				var existingItems = [];
+				$('.flex-cart-quant').each(function(i){
+					existingItems.push($($('.flex-cart-quant')[i]).data('id'));
+				});
+
+				Object.keys(ids).forEach(function(key){
+					var item = ids[key];
+					if(existingItems.indexOf(item.id) == -1){
+						var itemHtml = '<div class="col-12 mb-2"><div class="btn btn-primary w-100 '+item.initials+'-button">'+item.name+'</div></div><div class="col-6"><div class="form-group form-inline"><label for="'+item.initials+'-quantity">Q: </label><input class="form-control w-75 ml-1 flex-cart-quant" id="'+item.initials+'-flex-quantity" name="'+item.initials+'-quantity" data-id="'+item.initials+'-pouch" data-name="'+item.name+'" data-initials="'+item.initials+'" type="number" readonly required value=0 min="0" onchange="flexcartTotal(this);"></div></div><div class="col-6"><div class="form-group form-inline"><label for="'+item.initials+'-price">$ </label><input class="form-control w-75 ml-1 flex-cart-price" id="'+item.initials+'-flex-price" name="'+item.initials+'-price" type="number" readonly required value=20 min="0.01" max="25.00" step="any" onchange="flexcartTotal(this);"></div></div><div class="col-12"><p class="cart-subtotal" id="'+item.initials+'-flex-total">Total: $0</p></div>';
+						
+						$('#'+$(button).data('append')).append(itemHtml);
+					}
+				});
+				$('.flex-cart-quant').prop('readonly',false);
+				$('.flex-cart-price').prop('readonly',false);
+			} else {
+
+				var quants = $('.flex-cart-quant');
+				var prices = $('.flex-cart-price');
+				var sc = $(quants[0]).val()*$(prices[0]).val();
+				var mb = $(quants[1]).val()*$(prices[1]).val();
+				var pb = $(quants[2]).val()*$(prices[2]).val();
+				var totalPrice = sc+mb+pb;
+
+				var items = [];
+				for(var i=0;i<3;i++){
+					if($(quants[i]).val()>0){
+						items.push({
+							'id' : $(quants[i]).data('id'),
+					        'name' : $(quants[i]).data('name'),
+					        'quantity' : $(quants[i]).val(),
+					        'price' : $(prices[i]).val(),
+					        'totalPrice' : $(quants[i]).val()*$(prices[i]).val(),
+							'initials' : $(quants[i]).data('initials'),
+						});
+					}
+				}
+				var data = {
+					items : items,
+					planId : $(button).data('planid'),
+					totalPrice : totalPrice,
+					phone : $('#active-phone').data('phone')
+				}
+				
+				$('#loading-indicator').show();
+
+				var url = $(button).data('posturl');
+				$.ajax({
+			        url: url,
+			        type: "POST",
+			        dataType: "json",
+			        data: JSON.stringify(data),
+			        contentType: "application/json",
+			        cache: false,
+			        timeout: 5000,
+			        complete: function() {
+			        },
+			        success: function(data) {
+			            if(data.result == 'success'){
+			                $('#right-sidebar').html(data['sidebar']);
+			                var date = $('.starteddate').text();
+							$('.moment-replace').each(function(item){
+								var replaceSelector = $($('.moment-replace')[item]);
+								replaceSelector.text(moment(new Date(replaceSelector.text())).format('MM/DD/YYYY'));
+							});
+			                $('#loading-indicator').hide();
+			            } else {
+			            	$('#loading-indicator').hide();
+			                alert(data.error);
+			            }
+			        },
+			        error: function() {
+			        	$('#loading-indicator').hide();
+			        	console.log('error');
+			        }
+			    });
+			}
+
+		}
+
+		function flexStatus(link){
+			console.log(link);
+
+			var data = {
+				planId : $(link).data('planid'),
+				phone : $('#active-phone').data('phone')
+			}
+
+			// if($(link).data('url') == 'activate'){
+			// 	var url = '/resumeplan';
+			// } else {
+			// 	var url = '/pauseplan';
+			// }
+
+			var url = $(link).data('url');
+			console.log(url);
+
+			$('#loading-indicator').show();
+			$.ajax({
+		        url: url,
+		        type: "POST",
+		        dataType: "json",
+		        data: JSON.stringify(data),
+		        contentType: "application/json",
+		        cache: false,
+		        timeout: 5000,
+		        complete: function() {
+		        //called when complete
+		            // $('#loading-indicator').hide();
+		        },
+		        success: function(data) {
+		            if(data.result == 'success'){
+		                $('#right-sidebar').html(data['sidebar']);
+		                var date = $('.starteddate').text();
+						$('.moment-replace').each(function(item){
+							var replaceSelector = $($('.moment-replace')[item]);
+							replaceSelector.text(moment(new Date(replaceSelector.text())).format('MM/DD/YYYY'));
+						});
+		                $('#loading-indicator').hide();
+		            } else {
+		            	$('#loading-indicator').hide();
+		                alert(data.error);
+		            }
+		        },
+		        error: function() {
+		        	$('#loading-indicator').hide();
+		        	console.log('error');
+		        }
+		    });
+
+		}
+
+		function setflag(flag,bool){
+			var data = {
+				phone : $('#active-phone').data('phone'),
+				bool : bool,
+				flag : flag
+			};
+
+			console.log(data);
+
+			$('#loading-indicator').show();
+			$.ajax({
+		        url: "/setflag",
+		        type: "POST",
+		        dataType: "json",
+		        data: JSON.stringify(data),
+		        contentType: "application/json",
+		        cache: false,
+		        timeout: 5000,
+		        complete: function() {
+		        //called when complete
+		            // $('#loading-indicator').hide();
+		        },
+		        success: function(data) {
+		            if(data.result == 'success'){
+		                $('#right-sidebar').html(data['sidebar']);
+		                var date = $('.starteddate').text();
+						$('.moment-replace').each(function(item){
+							var replaceSelector = $($('.moment-replace')[item]);
+							replaceSelector.text(moment(new Date(replaceSelector.text())).format('MM/DD/YYYY'));
+						});
+		                $('#loading-indicator').hide();
+		            } else {
+		            	$('#loading-indicator').hide();
+		                alert(data.error);
+		            }
+		        },
+		        error: function() {
+		        	$('#loading-indicator').hide();
+		        	console.log('error');
+		        }
+		    });
+
+		}
+
+		function scrollUp(){
+			$("#conversation-list").animate({ scrollTop: 0 }, "fast");
+		}
+
+
+
+	</script>
+	<div id="active-user" style="display:none;"><%=user%></div>
+
+<script src="/socket.io/socket.io.js"></script>
+	<script>var socket = io();</script>
+
+<% include partials/footer %>

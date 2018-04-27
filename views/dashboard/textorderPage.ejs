@@ -1,0 +1,86 @@
+<% include partials/header %>
+
+<% found %>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-8">
+            <div class="well container col-sm-12">
+                <h2>Order Info</h2>
+                <div class="well">
+                    <h3>Invoice Number</h3>
+                    <p><%= found.invoiceNumber %></p>
+                    <h3>Customer Phone</h3>
+                    <p><a href="/textcustomers/<%= found.customerPhone %>"><%= found.customerPhone %></a></p>
+                    <h3>Stripe Payment</h3>
+                    <p><a href="https://dashboard.stripe.com/payments/<%= found.stripeCharge %>" target="_blank"><%= found.stripeCharge %></a></p>
+                    <h3>Completion Date</h3>
+                    <p><%= found.completionDate %></p>
+
+                </div>
+                <div class="well">
+                    <h3>Items</h3>
+                    <table class="table">
+                        <thead>
+                          <tr>
+                            <th>Item ID</th>
+                            <th>Item Name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total Price</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            <% found.items.forEach(function(item){ %>
+                                <tr>
+                                    <td><%= item.id %></a></td>
+                                    <td><%= item.name %></a></td>
+                                    <td><%= item.quantity %></td>
+                                    <td><%= item.price %></td>
+                                    <td><%= item.totalPrice %></td>
+                                </tr>
+                            <% });%>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="well">
+                <h3>Create Refund</h3>
+                <form action="/refundOrder" method="POST">
+                    <div class="form-group">
+                        <label class="form-label" for="amount">Refund amount</label>
+                        <input class="form-control" type="number" name="amount" step="any" placeholder="Leave blank for whole transaction">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="reason">Reason</label>
+                        <textarea class="form-control" type="textarea" name="reason" placeholder="Customer Requested"></textarea>
+                    </div>
+                    <input type="hidden" name="stripecharge" value="<% found.stripeCharge %>">
+                    <input type="hidden" name="orderno" value="<%= found.invoiceNumber %>">
+                    <input type="submit" class="btn btn-primary" value="Submit">
+                </form>
+            </div>
+            <% if(found.refund.length > 0){ %>
+            <div class="well">
+                <h3>Refunds</h3>
+                <% found.refund.forEach(function(refund){ %>
+                    <div>
+                        <p>Amount: <%= refund.amount %></p>
+                        <p>Reason: <%= refund.reason %></p>
+                        <p>Status: <%= refund.status %></p>
+                        <p>Date: <%= refund.refundDate %></p>
+                    </div>
+                <% }); %>
+            </div>
+            <% } %>
+        </div>
+    </div>
+    
+</div>
+
+
+
+
+
+<% include partials/footer %>

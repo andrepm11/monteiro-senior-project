@@ -1,0 +1,303 @@
+<% include partials/header %>
+
+<% found %>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-8">
+            <div class="well container col-sm-12">
+                <h2>Customer Info</h2>
+                <div class="well">
+                    <h3>Phone</h3>
+                    <p><%= found.phone %></p>
+                    <h3>Name</h3>
+                    <p><%= found.firstName + ' ' +found.lastName %></p>
+                    <h3>Email</h3>
+                    <p><%= found.email %></p>
+                    <h3>Slack Channel</h3>
+                    <p><a href="https://verb-energy.slack.com/messages/<%= found.slackChannel %>" target="_blank"><%= found.slackChannel %></a></p>
+                    <h3>Stripe ID</h3>
+                    <p><a href="https://dashboard.stripe.com/customers/<%= found.customerId %>" target="_blank"><%= found.customerId %></a></p>
+                    <h3>Created</h3>
+                    <p><%= found.created %></p>
+
+                </div>
+                <div class="well">
+                    <h2>Orders</h2>
+                    <div class="row">
+                        <div class="col-sm-4 col-sm-offset-2">
+                            <h3>Total Orders</h3>
+                            <p><%= found.totalOrders %></p>
+                        </div>
+                        <div class="col-sm-4">
+                            <h3>Total Value</h3>
+                            <p>$<%= found.totalValue %></p>
+                        </div>
+                    </div>
+                    <% if(found.totalOrders > 1){ %>
+                    <div class="row">
+                        <h3>Invoices</h3>
+                        <% found.orders.forEach(function(invoice){ %>
+                            <p><a href="/textOrders/<%= invoice.invoiceNumber %>"><%= invoice.invoiceNumber %></a></p>
+                        <% });%>
+                    </div>
+                    <%}%>
+
+                </div>
+                
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="well row">
+                <h2>Create Order</h2>
+                <form id="reorder">
+                    <div>
+                        <label for="phone">Phone</label>
+                        <input class="form-control" id="phone" name="phone" type="text" readonly value="<%= found.phone %>">
+                    </div>
+
+                    <h3 class="text-left">Cart</h3>
+
+                    <div>
+                        <label for="item-name">Item Name</label>
+                        <input class="form-control" id="item-name" name="item-name" type="text" readonly value="Oats and Cocoa (Box of 10)"> 
+                    </div>
+
+                    <div>
+                        <label for="quantity">Quantity</label>
+                        <input class="form-control" id="quantity" name="quantity" type="number" required value=1 onChange="totalPrice();">
+                    </div>
+
+                    <div>
+                        <label for="quantity">Price</label>
+                        <input class="form-control" id="price" name="price" type="number" required value=<%= price %> step="any" onChange="totalPrice();">
+                    </div>
+
+                    <h3 class="text-left">Shipping</h3>
+                    <div>
+                        <label for="shipping">Campus</label>
+                        <input name="shipping" class="shipping" type="radio" value="campus" onClick="shippingMethod(this);">
+                    </div>
+
+                    <div id="campus" class="shipping-input" style="display:none;">
+                        <select
+                            required
+                            class="form-control"
+                            id="school"
+                            name="school"
+                            >
+                            <option value="Yale">Yale</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="shipping">Ground Shipping</label>
+                        <input name="shipping" class="shipping" type="radio" required value="ground" checked="checked" onClick="shippingMethod(this);">
+                    </div>
+                    <div id="ground" class="shipping-input">
+                        <div>
+                            <label for="firstName">First Name</label>
+                            <input class="form-control" id="firstName" name="firstName" type="text" value="<%= found.firstName %>">
+                        </div>
+                        <div>
+                            <label for="lastName">Last Name</label>
+                            <input class="form-control" id="lastName" name="lastName" type="text" value="<%= found.lastName %>">
+                        </div>
+                        <div>
+                            <label for="address1">Address</label>
+                            <input id="address1" name="address1" class="form-control" type="text" placeholder="185 Berry St" value="<%= found.address.shippingAddress.address1 %>">
+                        </div>
+                        <div>
+                            <label for="address2">Secondary Address</label>
+                            <input id="address2" name="address2" class="form-control" type="text" placeholder="Apt 2" value="<%= found.address.shippingAddress.address2 %>">
+                        </div>
+                        <div>
+                            <label for="city">City</label>
+                            <input id="city" name="city" class="form-control" type="text" placeholder="New York" value="<%= found.address.shippingAddress.city %>">
+                        </div>
+                        <div>
+                            <label for="state">State</label>
+                            <input id="state" name="state" class="form-control" type="text" placeholder="NY" value="<%= found.address.shippingAddress.state %>">
+                        </div>
+                        <div>
+                            <label for="zip">Zip Code</label>
+                            <input id="zip" name="zip" class="form-control" type="text" placeholder="10001" value="<%= found.address.shippingAddress.zip %>">
+                        </div>
+                    </div>
+
+                    <input id="hidden-shipping" class="hidden" value="ground">
+
+                    <h3 class="text-left">Card Details</h3>
+                    <p class="text-left"><b>Brand</b> <%= found.card.brand %></p>
+                    <p class="text-left"><b>Last 4:</b> <%= found.card.last4 %></p>
+                    <p class="text-left"><b>Exp Month/Year:</b> <%= found.card.exp_month %> / <%= found.card.exp_year %></p>
+
+                    <h3 class="text-left" id="total-price">Total: $<%= price %></h3>
+
+                    <button type="submit">Submit</button>                    
+                        
+
+                </form>
+
+
+            </div>
+            <div class="well row">
+                <h2>Information</h2>
+                <hr>
+                <h3>Billing Address</h3>
+                <table>
+                    <tbody>
+                        <% var addressKeys = ['name','address1','address2','city','state','zip','country','phone'];
+                           addressKeys.forEach(function(key){ %>
+                               <tr>
+                                   <td><%= key %> : </td><td><%= found.address.billingAddress[key] %></td>
+                               </tr>
+                           <% }); %>
+
+                    </tbody>
+                    
+                </table>
+                <hr>
+                <h3>Shipping Address</h3>
+                <table>
+                    <tbody>
+                        <% addressKeys.forEach(function(key){ %>
+                               <tr>
+                                   <td><%= key %> : </td><td><%= found.address.shippingAddress[key] %></td>
+                               </tr>
+                           <% }); %>
+
+                    </tbody>
+                    
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="well col-sm-12">
+            <% loadQuant %>
+            <div class="container">
+            <% if(!(loadQuant >= found.chat.length)){ %>
+                <a href="/conversations/<%= found.phone %>?loadQuant=<%= loadQuant %>"><button>Load more</button></a>
+            <% } %>
+
+
+            <% found.chat.slice(Math.max(found.chat.length-loadQuant, 0)).forEach(function(chat){ %>
+                
+                <div class="row">
+                
+                <% if(chat.sender == 'Customer'){ %>
+
+                    <div class="speech-bubble them col-md-4 pull-left"><%= chat.message %></div>
+
+                <% } else { %>
+                    <div class="speech-bubble verb col-md-4 pull-right"><%= chat.message %></div>
+                <% } %>
+                </div>
+                
+            <%  }); %>
+
+                <div>
+
+                    <form action="/newChat" method="POST">
+
+                        <input type="text" name="phone" value="<%= found.phone %>">
+
+                        <input type="text" name="message" placeholder="New Message" value="" required>
+
+                        <input type="submit" value="Send">
+
+                    </form>
+
+                </div>
+
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+function shippingMethod(obj){
+
+    $('.shipping-input').css('display','none');
+
+    $('#'+$(obj).val()).css('display','block');
+
+    $('#hidden-shipping').val($(obj).val());
+
+}
+
+function totalPrice(){
+
+    $('#total-price').html('Total: $'+($('#quantity').val()*$('#price').val()).toString());
+}
+
+
+$(document).on('submit', '#reorder', function(evt){
+    evt.preventDefault();
+
+    var url = "/cart/set-session";
+    var data = {
+        "firstName": $('#firstName').val(),
+        "lastName": $('#lastName').val(),
+        "phone" : $('#phone').val(),
+        "quantity" : $('#quantity').val(),
+        "price" : $("#price").val(),
+        "shipping" : $('#hidden-shipping').val(),
+        "school" : $('#school').val(),
+        "address1" : $('#address1').val(),
+        "address2" : $('#address2').val(),
+        "city" : $('#city').val(),
+        "state" : $('#state').val(),
+        "zip" : $('#zip').val(),
+    };
+
+    data.items = [{
+        'id' : 'oc-box',
+        'name' : 'Oats and Cocoa (Box of 10)',
+        'quantity' : $('#quantity').val(),
+        'price' : $('#price').val(),
+        'totalPrice' : $('#total-price').val()
+    }];
+
+    console.log(data);
+
+    $.ajax({
+        url: '/reorder',
+        type: "POST",
+        dataType: "json",
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        cache: false,
+        timeout: 5000,
+        complete: function() {
+        //called when complete
+            // $('#loading-indicator').hide();
+        },
+        success: function(data) {
+            if(data.result == 'success'){
+                alert('Success!');
+            } else {
+
+                alert(data.error);
+                
+
+            }
+        },
+        error: function() {
+            $('#complete-order').prop('disabled', false);
+            $('#complete-order').removeClass('disabled');
+
+        }
+    });
+    // cartPost(url, data, partial(cartButton,$('#information-form')));
+    
+    return false;
+});
+</script>
+
+
+
+<% include partials/footer %>

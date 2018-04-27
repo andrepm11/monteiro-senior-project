@@ -1,0 +1,12 @@
+<% found.forEach(function(customer){ %>
+	<!-- <div class="row"> -->
+		<% if(customer.waitingOnResponse){ %>
+		<div id="<%=customer.phone%>" class="col-12 chat-preview unread-conversation" data-phone="<%=customer.phone%>">
+		<% } else { %>
+		<div id="<%=customer.phone%>" class="col-12 chat-preview" data-phone="<%=customer.phone%>">
+		<% } %>
+			<span class="name mb-0"><%= customer.firstName %> <%= customer.lastName%></span> <span class="conversation-timestamp"><%= moment(customer.chat[0].timestamp).fromNow() %></span>
+			<p class="text-peek"><%= customer.chat[0].message %></p>
+		</div>
+	<!-- </div> -->
+<% }); %>

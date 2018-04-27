@@ -1,0 +1,343 @@
+/* Mobile CSS*/
+
+
+body {
+	background-color:rgb(251, 249, 238);
+}
+
+.left-panel {
+	border:1px solid darkgray;
+}
+
+.right-panel {
+	border:1px solid darkgray;
+}
+#right-sidebar {
+	height:90vh;
+	overflow: scroll;
+	/*overflow-x: hidden;*/
+	-webkit-overflow-scrolling: touch;
+}
+
+.panel-header {
+	border-bottom:solid 1px darkgray;
+}
+
+.panel-body {
+	max-height:72vh;
+	overflow: scroll;
+	-webkit-overflow-scrolling: touch;
+}
+
+.text-peek {
+	margin-bottom: 0;
+	max-height:2.8em;
+	/*font-size:0.8em;*/
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+
+.chat-preview {
+	padding-top: 1em;
+	padding-bottom: 1em;
+	padding-left:35px;
+	font-size: 1em;
+	border-bottom: solid 1px darkgray;
+	max-height: 10em;
+}
+
+.chat-preview:hover{
+	background-color:#4698fb;
+	cursor:pointer;
+	color:white;
+}
+
+.active-preview{
+	background-color:#4698fb;
+	color:white!important;	
+}
+
+#conversation {
+	height:72vh;
+	width:100%;
+}
+
+#conversation-body{
+	height:71vh;
+	overflow: scroll;
+	-webkit-overflow-scrolling: touch;
+	/*padding-bottom: 2em;*/
+	width:100%;
+	overflow-x: hidden;
+	/*margin-bottom: 1em;*/
+}
+
+.text-bubble {
+
+	background-color:lightblue;
+	margin:0.5em;
+	padding:1em;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+
+	-ms-word-break: break-all;
+	/* This is the dangerous one in WebKit, as it breaks things wherever */
+	word-break: break-all;
+	/* Instead use this non-standard one: */
+	word-break: break-word;
+
+	/* Adds a hyphen where the word breaks, if supported (No Blink) */
+	-ms-hyphens: auto;
+	-moz-hyphens: auto;
+	-webkit-hyphens: auto;
+	hyphens: auto;
+	font-size: 0.8em;
+
+}
+
+.verb-text {
+	position:relative;
+	padding:10px 20px;
+	/*color:white; */
+	/*background:#2792f6;*/
+	background:rgb(242, 199, 92);
+	border-radius:10px;
+	float: right;
+	max-width: 60%;
+	margin-right:0.8em;
+}
+/*.verb-text::before {
+	content:"";
+	position:absolute;
+	z-index:-1;
+	bottom:-2px;
+	right:-7px;
+	height:20px;
+	border-right:20px solid rgb(242, 199, 92);
+	border-bottom-left-radius: 16px 14px;
+	-webkit-transform:translate(0, -2px);
+}
+
+.verb-text::after {
+	content:"";
+	position:absolute;
+	z-index:1;
+	bottom:-2px;
+	right:-56px;
+	width:26px;
+	height:20px;
+	background:rgb(251, 249, 238);
+	border-bottom-left-radius: 10px;
+	-webkit-transform:translate(-30px, -2px);
+}*/
+
+.not-delivered {
+	background-color:gray;
+	
+}
+.not-delivered::before {
+	border-right:20px solid gray;
+}
+
+.verb-timestamp {
+	clear: both;
+	float:right;
+	font-size:0.6em;
+}
+.customer-timestamp{
+	clear:both;
+	font-size:0.6em;
+}
+
+.customer-text {
+	position:relative;
+	padding:10px 20px;
+	background:#E5E5EA;
+	border-radius:10px;
+	color: black;
+  	float: left;
+  	max-width: 60%;
+  	margin-left:0.8em;
+
+}
+
+/*.customer-text::before {
+	content:"";
+	position:absolute;
+	z-index:2;
+	bottom:-2px;
+	left:-7px;
+	height:20px;
+	border-left:20px solid #E5E5EA;
+	border-bottom-right-radius: 16px 14px;
+	-webkit-transform:translate(0, -2px);
+}
+
+.customer-text::after {
+	content:"";
+	position:absolute;
+	z-index:3;
+	bottom:-2px;
+	left:4px;
+	width:26px;
+	height:20px;
+	background: rgb(251, 249, 238);
+	border-bottom-right-radius: 10px;
+	-webkit-transform:translate(-30px, -2px);
+}
+*/
+textarea {
+    resize: none;
+    border:2px solid lightgray !important;
+}
+
+textarea:focus{
+	outline: none;
+	box-shadow:none !important;
+	border:2px solid black !important;
+}
+
+.message-timestamp {
+	display:none;
+}
+
+.active-timestamp {
+	display: block;
+}
+
+.conversation-timestamp {
+	font-size:0.8em;
+	color:#6c757d;
+}
+
+.chat-preview:hover .conversation-timestamp{
+	color:white;
+}
+.active-preview .conversation-timestamp {
+	color:white;
+}
+
+.unread-conversation:before {
+	content: ' \25CF';
+	color:#157efb;
+	position: absolute;
+	font-size:0.5em;
+	left:4%;
+	top:30%;
+	/*top:0px;*/
+}
+
+.conversation-filter{
+	background-color:transparent;
+	color:#007bff;
+}
+
+.active-button {
+	background-color:#007bff;
+	color:white;
+}
+
+/* Desktop CSS*/
+@media (min-width: 992px) {
+	.panel-body {
+		max-height:78vh;
+		/*overflow: scroll;*/
+	}
+
+	.chat-preview {
+		padding-left:25px;
+		font-size: 0.8em;
+	}
+	#conversation {
+		height:80vh;
+	}
+	#conversation-body{
+		height:72vh;
+	}
+
+}
+
+
+/* Unchanging CSS*/
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+.message-input {
+	/*border-top:solid 1px darkgray;*/
+	padding:10px;	
+}
+
+
+.sidebar-btn{
+	background-color:rgb(242, 199, 92);
+	/*border:1px solid darkgray;*/
+	color:black;
+	text-decoration: none;
+	border-radius: 5px;
+	padding-top:10px;
+	padding-bottom:10px;
+}
+
+.loader{
+ position: fixed;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background: url('../img/Spin-1s-200px.gif') 50% 50% no-repeat;
+  opacity:0.8;
+}
+
+
+.active-flex {
+	background-color:#55b258;
+	cursor: default
+}
+.active-flex:hover{
+	cursor: default!important;
+}
+.paused-flex {
+	background-color:rgb(241, 129, 126);
+}
+
+.sc-button {
+	background-color:rgb(241, 129, 126) !important; 
+	border:none !important; 
+	color:black !important;
+}
+
+.mb-button {
+	background-color:rgb(146, 164, 206) !important; 
+	border:none !important; 
+	color:black !important;
+}
+
+.pb-button {
+	background-color:rgb(242, 199, 92) !important; 
+	border:none !important; 
+	color:black !important;
+}
+
+.dimmed:after {
+  content: " ";
+  z-index: 10;
+  display: block;
+  position: absolute;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.thumbnail {
+	max-width:50%;
+	height:auto;
+}

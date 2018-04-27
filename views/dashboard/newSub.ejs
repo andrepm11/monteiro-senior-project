@@ -1,0 +1,153 @@
+<% include partials/header %>
+<div class="container">
+    <div class="left-align">
+        <form action="/subscriptions" method="POST">
+            <div class="form-group">
+                <label>SubscriptionId</label>
+                <input class="col-10" type="text" name="subscriptionId" placeholder="sub_BTJKWtbfJWDD1L" value="">
+            </div>
+            <div class="form-group">
+                <label>totalSpent</label>
+                <input class="col-10" type="text" name="totalSpent" placeholder="11.27" value="">
+            </div>
+            <div class="form-group">
+                <label>gatewayId</label>
+                <input class="col-10" type="text" name="gatewayId" placeholder="sub_BTJKWtbfJWDD1L" value="">
+            </div>
+            <div class="form-group">
+                <label>startsOn</label>
+                <input class="col-10" type="text" name="startsOn" placeholder="2017-07-02T21:07:13.460Z" value="2017-07-02T21:07:13.460Z">
+            </div>
+            <div class="form-group">
+                <label>status</label>
+                <input class="col-10" type="text" name="status" placeholder="Active" value="Active">
+            </div>
+            <h2>User</h2>
+            <div class="form-group">
+                <label>email</label>
+                <input class="col-10" type="text" name="email" placeholder="andre@verbenergybar.com" value="">
+            </div>
+            <div class="form-group">
+                <label>shippingName</label>
+                <input class="col-10" type="text" name="shippingAddress.name" placeholder="Andre" value="">
+            </div>
+            <div class="form-group">
+                <label>shippingCompany</label>
+                <input class="col-10" type="text" name="shippingAddress.company" placeholder="Verb" value="">
+            </div>
+            <div class="form-group">
+                <label>shippingAddress1</label>
+                <input class="col-10" type="text" name="shippingAddress.address1" placeholder="7485 SW 163rd St" value="">
+            </div>
+            <div class="form-group">
+                <label>shippingAddress2</label>
+                <input class="col-10" type="text" name="shippingAddress.address2" placeholder="Apt 1" value="">
+            </div>
+            <div class="form-group">
+                <label>shippingAddressCity</label>
+                <input class="col-10" type="text" name="shippingAddress.city" placeholder="Miami" value="">
+            </div>
+            <div class="form-group">
+                <label>shippingAddressState</label>
+                <input class="col-10" type="text" name="shippingAddress.state" placeholder="FL" value="">
+            </div>
+            <div class="form-group">
+                <label>shippingAddressCountry</label>
+                <input class="col-10" type="text" name="shippingAddress.country" placeholder="USA" value="">
+            </div>
+            <div class="form-group">
+                <label>shippingAddressZip</label>
+                <input class="col-10" type="text" name="shippingAddress.zip" placeholder="33157" value="">
+            </div>
+            <div class="form-group">
+                <label>shippingAddressPhone</label>
+                <input class="col-10" type="text" name="shippingAddress.phone" placeholder="7863008768" value="">
+            </div>
+            <div class="form-group">
+                <label>billingName</label>
+                <input class="col-10" type="text" name="billingAddress.name" placeholder="Andre" value="">
+            </div>
+            <div class="form-group">
+                <label>billingCompany</label>
+                <input class="col-10" type="text" name="billingAddress.company" placeholder="Verb" value="">
+            </div>
+            <div class="form-group">
+                <label>billingAddress1</label>
+                <input class="col-10" type="text" name="billingAddress.address1" placeholder="7485 SW 163rd St" value="">
+            </div>
+            <div class="form-group">
+                <label>billingAddress2</label>
+                <input class="col-10" type="text" name="billingAddress.address2" placeholder="Apt 1" value="">
+            </div>
+            <div class="form-group">
+                <label>billingAddressCity</label>
+                <input class="col-10" type="text" name="billingAddress.city" placeholder="Miami" value="">
+            </div>
+            <div class="form-group">
+                <label>billingAddressState</label>
+                <input class="col-10" type="text" name="billingAddress.state" placeholder="FL" value="">
+            </div>
+            <div class="form-group">
+                <label>billingAddressCountry</label>
+                <input class="col-10" type="text" name="billingAddress.country" placeholder="USA" value="">
+            </div>
+            <div class="form-group">
+                <label>billingAddressZip</label>
+                <input class="col-10" type="text" name="billingAddress.zip" placeholder="33157" value="">
+            </div>
+            <div class="form-group">
+                <label>billingAddressPhone</label>
+                <input class="col-10" type="text" name="billingAddress.phone" placeholder="7863008768" value="">
+            </div>
+            <h2>Plan</h2>
+            <div class="form-group">
+                <label>ID</label>
+                <input class="col-10" type="text" name="plan.id" placeholder="Monthly-Sub-10" value="">
+            </div>
+            <div class="form-group">
+                <label>name</label>
+                <input class="col-10" type="text" name="plan.name" placeholder="10 Bar Verb Subscription (Boxes of 10)" value="">
+            </div>
+            <div class="form-group">
+                <label>amount</label>
+                <input class="col-10" type="text" name="plan.amount" placeholder="20" value="">
+            </div>
+            <div class="form-group">
+                <label>quantity</label>
+                <input class="col-10" type="text" name="plan.quantity" placeholder="2" value="">
+            </div>
+            <div class="form-group">
+                <label>totalAmount</label>
+                <input class="col-10" type="text" name="plan.totalAmount" placeholder="40" value="">
+            </div>
+            <div class="form-group">
+                <label>interval</label>
+                <input class="col-10" type="text" name="plan.interval" placeholder="Month" value="">
+            </div>
+            <div class="form-group">
+                <label>intervalCount</label>
+                <input class="col-10" type="text" name="plan.intervalCount" placeholder="1" value="">
+            </div>
+            <div class="form-group">
+                <label>trialPeriodInDays</label>
+                <input class="col-10" type="text" name="plan.trialPeriodInDays" placeholder="30" value="">
+            </div>
+            <h2>Invoices</h2>
+            <div class="form-group">
+                <label>firstInvoice</label>
+                <input class="col-10" type="text" name="invoices.invoiceNumber" placeholder="VERB1234" value="">
+            </div>
+            <h2>Shipping</h2>
+            <div class="form-group">
+                <label>shippingType</label>
+                <input class="col-10" type="text" name="shipping.shippingType" placeholder="VERB1234" value="Ground Shipping / Campus Pick-Up">
+            </div>
+            <div class="form-group">
+                <input type="submit">
+            </div>
+            
+        </form>
+    </div>
+</div>
+
+<% include partials/footer %>
