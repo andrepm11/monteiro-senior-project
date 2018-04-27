@@ -27,7 +27,7 @@ var MessagingResponse = require('twilio').twiml.MessagingResponse;
 var https = require('https');
 var fs = require('fs');
 
-router.get("/texttobuy", isLoggedIn, function(req,res){
+router.get("/dashboard", isLoggedIn, function(req,res){
     var dashboardData = {};
     var finished = _.after(10, doRender);
 
