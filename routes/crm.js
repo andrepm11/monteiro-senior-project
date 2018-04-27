@@ -235,6 +235,44 @@ router.get("/crm-chat", function(req,res){
 
 });
 
+router.post("/setflag", function(req,res){
+
+
+  var data = {'result':'success'};
+  TextCustomer.findOne({'phone':req.body.phone},
+        {
+          'firstName':1,'lastName':1,'chat':{$slice:-10},'totalValue':1,'totalOrders':1,
+          'phone':1,'customerId':1,'email':1,'created':1,'orders':1,'address':1,'card':1,'dontText':1,'flagged':1
+        }).exec(function(err,foundCustomer){
+        if(err){
+          console.log('CRM ERROR 4');
+          console.log(err);
+        } else{
+
+          foundCustomer[req.body.flag] = req.body.bool;
+          foundCustomer.save(function(err,saved){
+            if(err){
+              console.log(err);
+            } else {
+
+              console.log(saved);
+
+                res.render('crm/partials/right-sidebar', {found:foundCustomer, user:req.session.activeUser}, function(err,sidebar){
+                  if(err){
+                    console.log(err);
+                  } else {
+
+                    data.sidebar = sidebar;
+                    res.send(data);
+                  }
+                });
+            }
+          });
+        }
+      });
+
+});
+
 
 router.get("/lastInteraction", function(req,res){
     TextCustomer.find({},null,{sort:{"created":1}}, function(err,found){
