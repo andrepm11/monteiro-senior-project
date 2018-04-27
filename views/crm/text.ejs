@@ -239,10 +239,10 @@
 		}
 
 		function bindReorderSubmit(){
-			$('#reorder').on('submit', function(evt){
-			    evt.preventDefault();
+			console.log('here');
+			$('.submit-order').on('click', function(evt){
+			    // evt.preventDefault();
 
-			    var url = "/cart/set-session";
 			    var data = {
 			        "firstName": $('#firstName').val(),
 			        "lastName": $('#lastName').val(),
@@ -258,11 +258,8 @@
 
 			    var quants = $('.cart-quant');
 				var prices = $('.cart-price');
-				var sc = $(quants[0]).val()*$(prices[0]).val();
-				var mb = $(quants[1]).val()*$(prices[1]).val();
-				var pb = $(quants[2]).val()*$(prices[2]).val();
+				var tp = $(quants[0]).val()*$(prices[0]).val();
 
-				// console.log(data);
 				data.items = [];
 				for(var i=0;i<3;i++){
 					if($(quants[i]).val()>0){
@@ -275,47 +272,32 @@
 					}
 				}
 
-			    // data.items = [{
-			    //     'id' : 'oc-box',
-			    //     'name' : 'Oats and Cocoa (Box of 10)',
-			    //     'quantity' : $(quants[0]).val(),
-			    //     'price' : $(prices[0]).val(),
-			    //     'totalPrice' : $(quants[0]).val()*$(prices[0]).val()
-			    // }];
+				$.ajax({
+			        url: '/reorder',
+			        type: "POST",
+			        dataType: "json",
+			        data: JSON.stringify(data),
+			        contentType: "application/json",
+			        cache: false,
+			        timeout: 5000,
+			        complete: function() {
+			        //called when complete
+			            // $('#loading-indicator').hide();
+			        },
+			        success: function(data) {
+			            if(data.result == 'success'){
+			                alert('Success!');
+			            } else {
+			                alert(data.error);
+			            }
+			        },
+			        error: function() {
+			            $('#complete-order').prop('disabled', false);
+			            $('#complete-order').removeClass('disabled');
 
-			    console.log(data);
+			        }
+			    });
 
-			    // $('#loading-indicator').show();
-
-			    // $.ajax({
-			    //     url: '/reorder',
-			    //     type: "POST",
-			    //     dataType: "json",
-			    //     data: JSON.stringify(data),
-			    //     contentType: "application/json",
-			    //     cache: false,
-			    //     timeout: 5000,
-			    //     complete: function() {
-			    //     //called when complete
-			    //         // $('#loading-indicator').hide();
-			    //     },
-			    //     success: function(data) {
-			    //         if(data.result == 'success'){
-			    //             alert('Success!');
-			    //             $('#loading-indicator').hide();
-			    //         } else {
-			    //             alert(data.error);
-			    //             $('#loading-indicator').hide();
-			    //         }
-			    //     },
-			    //     error: function() {
-			    //         alert('Error');
-			    //         $('#loading-indicator').hide();
-
-			    //     }
-			    // });
-			    // cartPost(url, data, partial(cartButton,$('#information-form')));
-			    
 			    return false;
 			});
 		}
@@ -512,205 +494,13 @@
 		function cartTotal(object){
 			var quants = $('.cart-quant');
 			var prices = $('.cart-price');
-			var oc = $(quants[0]).val()*$(prices[0]).val();
-			var mb = $(quants[1]).val()*$(prices[1]).val();
-			var pb = $(quants[2]).val()*$(prices[2]).val();
-			$('#sc-total').text('Total: $'+(oc));
-			$('#mb-total').text('Total: $'+(mb));
-			$('#pb-total').text('Total: $'+(pb));
-			$('#cart-total').text('Total: $'+(oc+mb+pb));
-		}
-		function flexcartTotal(object){
-			var quants = $('.flex-cart-quant');
-			var prices = $('.flex-cart-price');
-			var oc = $(quants[0]).val()*$(prices[0]).val();
-			var mb = $(quants[1]).val()*$(prices[1]).val();
-			var pb = $(quants[2]).val()*$(prices[2]).val();
-
-			var priceList = {};
-
-			var prices = $('.flex-cart-price');
-			$('.flex-cart-quant').each(function(i){
-				priceList[$($('.flex-cart-quant')[i]).data('initials')] = $($('.flex-cart-quant')[i]).val()*$(prices[i]).val();
-			});
-			$('#sc-flex-total').text('Total: $'+(priceList['sc']));
-			$('#mb-flex-total').text('Total: $'+(priceList['mb']));
-			$('#pb-flex-total').text('Total: $'+(priceList['pb']));
-			$('#flex-cart-total').text('Total: $'+(priceList['sc']+priceList['mb']+priceList['pb']));
-		}
-
-		function flexButton(button){
-			var active = $(button).data('active');
-			var inactive = $(button).data('inactive');
+			var tp = $(quants[0]).val()*$(prices[0]).val();
 			
-
-			$('#'+active).css('display','none');
-			$('#'+inactive).css('display','block');
-
-
-			$(button).data('active',inactive);
-			$(button).data('inactive',active);
-			var active = $(button).data('active');
-			var inactive = $(button).data('inactive');
-			$(button).text(inactive);
-
+			$('#tp-total').text('Total: $'+(tp));
+			
+			$('#cart-total').text('Total: $'+(tp));
 		}
-
-		function editFlexPlan(button){
-
-			if($(button).data('action') == 'edit'){
-				$(button).data('action', 'save');
-				$(button).text('Save');
-				var idx = $(button).data('index');
-				var ids = {
-					'sc-pouch':{
-						'id':'sc-pouch',
-						'name' : 'Simply Cocoa',
-						'initials':'sc'
-					},
-					'mb-pouch':{
-						'id':'mb-pouch',
-						'name' : 'Maple Blueberry',
-						'initials':'mb'
-					},
-					'pb-pouch':{
-						'id':'pb-pouch',
-						'name' : 'Salted Peanut Butter',
-						'initials':'pb'
-					}
-				};
-				var existingItems = [];
-				$('.flex-cart-quant').each(function(i){
-					existingItems.push($($('.flex-cart-quant')[i]).data('id'));
-				});
-
-				Object.keys(ids).forEach(function(key){
-					var item = ids[key];
-					if(existingItems.indexOf(item.id) == -1){
-						var itemHtml = '<div class="col-12 mb-2"><div class="btn btn-primary w-100 '+item.initials+'-button">'+item.name+'</div></div><div class="col-6"><div class="form-group form-inline"><label for="'+item.initials+'-quantity">Q: </label><input class="form-control w-75 ml-1 flex-cart-quant" id="'+item.initials+'-flex-quantity" name="'+item.initials+'-quantity" data-id="'+item.initials+'-pouch" data-name="'+item.name+'" data-initials="'+item.initials+'" type="number" readonly required value=0 min="0" onchange="flexcartTotal(this);"></div></div><div class="col-6"><div class="form-group form-inline"><label for="'+item.initials+'-price">$ </label><input class="form-control w-75 ml-1 flex-cart-price" id="'+item.initials+'-flex-price" name="'+item.initials+'-price" type="number" readonly required value=20 min="0.01" max="25.00" step="any" onchange="flexcartTotal(this);"></div></div><div class="col-12"><p class="cart-subtotal" id="'+item.initials+'-flex-total">Total: $0</p></div>';
-						
-						$('#'+$(button).data('append')).append(itemHtml);
-					}
-				});
-				$('.flex-cart-quant').prop('readonly',false);
-				$('.flex-cart-price').prop('readonly',false);
-			} else {
-
-				var quants = $('.flex-cart-quant');
-				var prices = $('.flex-cart-price');
-				var sc = $(quants[0]).val()*$(prices[0]).val();
-				var mb = $(quants[1]).val()*$(prices[1]).val();
-				var pb = $(quants[2]).val()*$(prices[2]).val();
-				var totalPrice = sc+mb+pb;
-
-				var items = [];
-				for(var i=0;i<3;i++){
-					if($(quants[i]).val()>0){
-						items.push({
-							'id' : $(quants[i]).data('id'),
-					        'name' : $(quants[i]).data('name'),
-					        'quantity' : $(quants[i]).val(),
-					        'price' : $(prices[i]).val(),
-					        'totalPrice' : $(quants[i]).val()*$(prices[i]).val(),
-							'initials' : $(quants[i]).data('initials'),
-						});
-					}
-				}
-				var data = {
-					items : items,
-					planId : $(button).data('planid'),
-					totalPrice : totalPrice,
-					phone : $('#active-phone').data('phone')
-				}
-				
-				$('#loading-indicator').show();
-
-				var url = $(button).data('posturl');
-				$.ajax({
-			        url: url,
-			        type: "POST",
-			        dataType: "json",
-			        data: JSON.stringify(data),
-			        contentType: "application/json",
-			        cache: false,
-			        timeout: 5000,
-			        complete: function() {
-			        },
-			        success: function(data) {
-			            if(data.result == 'success'){
-			                $('#right-sidebar').html(data['sidebar']);
-			                var date = $('.starteddate').text();
-							$('.moment-replace').each(function(item){
-								var replaceSelector = $($('.moment-replace')[item]);
-								replaceSelector.text(moment(new Date(replaceSelector.text())).format('MM/DD/YYYY'));
-							});
-			                $('#loading-indicator').hide();
-			            } else {
-			            	$('#loading-indicator').hide();
-			                alert(data.error);
-			            }
-			        },
-			        error: function() {
-			        	$('#loading-indicator').hide();
-			        	console.log('error');
-			        }
-			    });
-			}
-
-		}
-
-		function flexStatus(link){
-			console.log(link);
-
-			var data = {
-				planId : $(link).data('planid'),
-				phone : $('#active-phone').data('phone')
-			}
-
-			// if($(link).data('url') == 'activate'){
-			// 	var url = '/resumeplan';
-			// } else {
-			// 	var url = '/pauseplan';
-			// }
-
-			var url = $(link).data('url');
-			console.log(url);
-
-			$('#loading-indicator').show();
-			$.ajax({
-		        url: url,
-		        type: "POST",
-		        dataType: "json",
-		        data: JSON.stringify(data),
-		        contentType: "application/json",
-		        cache: false,
-		        timeout: 5000,
-		        complete: function() {
-		        //called when complete
-		            // $('#loading-indicator').hide();
-		        },
-		        success: function(data) {
-		            if(data.result == 'success'){
-		                $('#right-sidebar').html(data['sidebar']);
-		                var date = $('.starteddate').text();
-						$('.moment-replace').each(function(item){
-							var replaceSelector = $($('.moment-replace')[item]);
-							replaceSelector.text(moment(new Date(replaceSelector.text())).format('MM/DD/YYYY'));
-						});
-		                $('#loading-indicator').hide();
-		            } else {
-		            	$('#loading-indicator').hide();
-		                alert(data.error);
-		            }
-		        },
-		        error: function() {
-		        	$('#loading-indicator').hide();
-		        	console.log('error');
-		        }
-		    });
-
-		}
-
+		
 		function setflag(flag,bool){
 			var data = {
 				phone : $('#active-phone').data('phone'),

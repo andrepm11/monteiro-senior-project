@@ -536,6 +536,13 @@ router.post("/cart/web-charge", function(req,res){
                                                 items : items,
                                                 totalPacks : totalQuantity,
                                                 pricePerPack : totalPrice / totalQuantity,
+                                                address : {
+                                                    address1 : req.body.address1,
+                                                    address2 : req.body.address2,
+                                                    city : req.body.city,
+                                                    state : req.body.state,
+                                                    zip : req.body.zip
+                                                },
                                                 completionDate : new Date(),
                                                 paid : charge.amount / 100,
                                             }, function(err,order){
@@ -690,6 +697,13 @@ router.post("/cart/web-charge", function(req,res){
                                             items : items,
                                             totalPacks : totalQuantity,
                                             pricePerPack : totalPrice / totalQuantity,
+                                            address : {
+                                                address1 : req.body.address1,
+                                                address2 : req.body.address2,
+                                                city : req.body.city,
+                                                state : req.body.state,
+                                                zip : req.body.zip
+                                            },
                                             completionDate : new Date(),
                                             paid : charge.amount / 100,
                                         }, function(err,order){
@@ -800,8 +814,13 @@ router.post("/reorder", function(req,res){
           if(found){
               if(found.customerId){
                   
-                  var totalQuantity = req.body.quantity*10;
-                  var totalPrice = req.body.quantity * parseFloat(req.body.price);
+                  var totalQuantity = 0;
+                  var totalPrice = 0;
+                  req.session.items.forEach(function(item){
+                      totalQuantity += item.quantity;
+                      totalPrice += item.price*item.quantity;
+                  });
+                  totalQuantity = parseInt(totalQuantity);
 
                   TextOrder.findOne({}, null, {sort:{"invoiceNumber":-1}}, function(err,order){
                       if(err){
@@ -816,7 +835,7 @@ router.post("/reorder", function(req,res){
                           } else {
                               var newOrder = 'OSHT1000';
                           }
-                          var price = req.body.price;
+                          // var price = req.body.price;
                           stripe.charges.create({
                               amount : Math.round(totalPrice * 100),
                               currency : 'usd',
@@ -832,131 +851,61 @@ router.post("/reorder", function(req,res){
                                   res.send({result:'error',error:err.message});
                                   //ERROR
                               } else {
-                                  klaviyoPlacedOrder(found.email);
-                                  klaviyoTextReorder(found.email);
                                   
                                   var items = req.body.items;
-                                  items.forEach(function(item){
-                                      item.price = price;
-                                      item.totalPrice = item.quantity*price;
+                                  // items.forEach(function(item){
+                                  //     item.price = price;
+                                  //     item.totalPrice = item.quantity*price;
+                                  // });
+
+                                  
+                                  TextOrder.create({
+                                      firstName : req.body.firstName,
+                                      lastName : req.body.lastName,
+                                      email : found.email,
+                                      invoiceNumber : newOrder,
+                                      customerPhone : found.phone,
+                                      stripeCharge : charge.id,
+                                      items : items,
+                                      totalPacks : totalQuantity,
+                                      pricePerPack : totalPrice / totalQuantity,
+                                      address : {
+                                          address1 : req.body.address1,
+                                          address2 : req.body.address2,
+                                          city : req.body.city,
+                                          state : req.body.state,
+                                          zip : req.body.zip
+                                      },
+                                      completionDate : new Date(),
+                                      paid : charge.amount / 100
+                                  }, function(err,order){
+                                      if(err){
+                                          console.log('ERROR - Creating order');
+                                          console.log('Customer: '+req.body.firstName+' '+req.body.lastName);
+                                          console.log('Email: '+found.email);
+                                          console.log(err);
+                                          res.send({result:'error',error:'Something went wrong. Please refresh and try again in a minute.'});
+                                      } else {
+                                          console.log('----- Order created -----');
+                                          console.log('Invoice: '+newOrder);
+                                          console.log('Customer: '+req.body.firstName+' '+req.body.lastName);
+                                          console.log('Phone: '+found.phone);
+                                          res.send({result:'success'});
+                                      }
                                   });
-
-                                  var channel = 'ground shipping';
-
-                                  if(req.body.shipping == 'campus'){
-                                      TextOrder.create({
-                                          firstName : req.body.firstName,
-                                          lastName : req.body.lastName,
-                                          email : found.email,
-                                          invoiceNumber : newOrder,
-                                          customerPhone : found.phone,
-                                          stripeCharge : charge.id,
-                                          items : items,
-                                          totalBars : totalQuantity,
-                                          pricePerBar : totalPrice / totalQuantity,
-                                          shipping : {
-                                              shippingType : req.body.shipping,
-                                              status : 'Pending'
-                                          },
-                                          orderType : 'Reorder',
-                                          school : req.body.school,
-                                          completionDate : new Date(),
-                                          paid : charge.amount / 100
-                                      }, function(err,order){
-                                          if(err){
-                                              console.log('ERROR - Creating order');
-                                              console.log('Customer: '+req.body.firstName+' '+req.body.lastName);
-                                              console.log('Email: '+found.email);
-                                              console.log(err);
-                                              res.send({result:'error',error:'Something went wrong. Please refresh and try again in a minute.'});
-                                          } else {
-                                              console.log('----- Manual Order created -----');
-                                              console.log('Invoice: '+newOrder);
-                                              console.log('Customer: '+req.body.firstName+' '+req.body.lastName);
-                                              console.log('Phone: '+found.phone);
-                                              res.send({result:'success'});
-                                          }
-                                      });
-
-
-                                      channel = req.body.school;
-
-                                      found.school = req.body.school;
-
-                                      web.groups.rename(found.slackChannel, req.body.school.substr(0,4)+'-'+found.firstName+'-'+found.lastName);
-                                  } else {
-                                      TextOrder.create({
-                                          firstName : req.body.firstName,
-                                          lastName : req.body.lastName,
-                                          email : found.email,
-                                          invoiceNumber : newOrder,
-                                          customerPhone : found.phone,
-                                          stripeCharge : charge.id,
-                                          items : items,
-                                          totalBars : totalQuantity,
-                                          pricePerBar : totalPrice / totalQuantity,
-                                          shipping : {
-                                              shippingType : req.body.shipping,
-                                              status : 'Pending'
-                                          },
-                                          orderType : 'Web',
-                                          address : {
-                                              address1 : req.body.address1,
-                                              address2 : req.body.address2,
-                                              city : req.body.city,
-                                              state : req.body.state,
-                                              zip : req.body.zip
-                                          },
-                                          completionDate : new Date(),
-                                          paid : charge.amount / 100
-                                      }, function(err,order){
-                                          if(err){
-                                              console.log('ERROR - Creating order');
-                                              console.log('Customer: '+req.body.firstName+' '+req.body.lastName);
-                                              console.log('Email: '+found.email);
-                                              console.log(err);
-                                              res.send({result:'error',error:'Something went wrong. Please refresh and try again in a minute.'});
-                                          } else {
-                                              console.log('----- Order created -----');
-                                              console.log('Invoice: '+newOrder);
-                                              console.log('Customer: '+req.body.firstName+' '+req.body.lastName);
-                                              console.log('Phone: '+found.phone);
-                                              res.send({result:'success'});
-                                          }
-                                      });
-
-                                      // found.address = {
-                                      //     shippingAddress : {
-                                      //         address1 : req.body.address1,
-                                      //         address2 : req.body.address2,
-                                      //         city : req.body.city,
-                                      //         state : req.body.state,
-                                      //         zip : req.body.zip
-                                      //     }
-                                      // };
-
-                                      web.groups.rename(found.slackChannel, 'web-'+found.firstName+'-'+found.lastName);
-                                  }
 
                                   found.totalOrders += 1;
                                   found.totalValue += charge.amount / 100;
                                   found.orders.push({'invoiceNumber':newOrder});
 
-                                  found.status="REORDERED";
-
-
-                                  if(req.body.shipping == 'campus'){
-                                    var messageBody = 'Your order of TP Packs has been completed!';
-                                  }else{
-                                    var messageBody = 'Your order of TP Packs has been completed! We\'ll let you know once they\'ve shipped.';
-                                  }
+                                  var messageBody = 'Your order of TP Packs has been completed! We\'ll let you know once they\'ve shipped.';
                                   
 
                                   client.messages.create({
                                       body:messageBody,
                                       to:found.phone,
-                                      from:'+14159158372',
-                                      statusCallback: 'https://dash.verbenergybar.com/twilioCallBack',
+                                      from:'+17864603490',
+                                      statusCallback: 'https://monteiro-senior-project.herokuapp.com/twilioCallBack',
                                   }, function(err,message){
                                       if(err){
                                           console.log('ERROR - Sending order confirmation text');

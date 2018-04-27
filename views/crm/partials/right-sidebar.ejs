@@ -13,62 +13,22 @@
 					<form id="reorder">
 							<div class="row mb-1">
 								<div class="col-12 mb-2">
-									<div class="btn btn-primary w-100 sc-button">Simply Cocoa</div>
+									<div class="btn btn-primary w-100 tp-button">TP Mega Pack</div>
 								</div>
 								<div class="col-6">
 									<div class="form-group form-inline">
-										<label for="sc-quantity">Q: </label>
-										<input class="cart-quant form-control w-75 ml-1" id="sc-quantity" name="sc-quantity" data-id="sc-pouch" data-name="Simply Cocoa (Pouch of 12)" type="number" required value=1 min="0" onchange="cartTotal(this);">
+										<label for="tp-quantity">Q: </label>
+										<input class="cart-quant form-control w-75 ml-1" id="tp-quantity" name="tp-quantity" data-id="tp-mega-pack" data-name="TP Mega Pack" type="number" required value=1 min="0" onchange="cartTotal(this);">
 									</div>
 								</div>
 								<div class="col-6">
 									<div class="form-group form-inline">
-										<label for="sc-price">$ </label>
-										<input class="cart-price form-control w-75 ml-1" id="sc-price" name="sc-price" type="number" required value=20 min="0.01" max="25.00" step="any" onchange="cartTotal(this);">
-									</div>
-								</div>
-								<div class="col-12">
-									<p class="cart-subtotal" id="sc-total">Total: $20</p>
-								</div>
-							</div>
-							<div class="row mb-1">
-								<div class="col-12 mb-2">
-									<div class="btn btn-primary w-100 mb-button">Maple Blueberry</div>
-								</div>
-								<div class="col-6">
-									<div class="form-group form-inline">
-										<label for="mb-quantity">Q: </label>
-										<input class="cart-quant form-control w-75 ml-1" id="mb-quantity" name="mb-quantity" data-id="mb-pouch" data-name="Maple Blueberry (Pouch of 12)" type="number" required value=0 min="0" onchange="cartTotal(this);">
-									</div>
-								</div>
-								<div class="col-6">
-									<div class="form-group form-inline">
-										<label for="mb-price">$ </label>
-										<input class="cart-price form-control w-75 ml-1" id="mb-price" name="mb-price" type="number" required value=20 min="0.01" max="25.00" step="any" onchange="cartTotal(this);">
+										<label for="tp-price">$ </label>
+										<input class="cart-price form-control w-75 ml-1" id="tp-price" name="tp-price" type="number" required value=20 min="0.01" max="25.00" step="any" onchange="cartTotal(this);">
 									</div>
 								</div>
 								<div class="col-12">
-									<p class="cart-subtotal" id="mb-total">Total: $0</p>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-12 mb-2">
-									<div class="btn btn-primary w-100 pb-button">Salted Peanut Butter</div>
-								</div>
-								<div class="col-6">
-									<div class="form-group form-inline">
-										<label for="pb-quantity">Q: </label>
-										<input class="cart-quant form-control w-75 ml-1" id="pb-quantity" name="pb-quantity" data-id="pb-pouch" data-name="Salted Peanut Butter (Pouch of 12)" type="number" required value=0 min="0" onchange="cartTotal(this);">
-									</div>
-								</div>
-								<div class="col-6">
-									<div class="form-group form-inline">
-										<label for="pb-price">$ </label>
-										<input class="cart-price form-control w-75 ml-1" id="pb-price" name="pb-price" type="number" required value=20 min="0.01" max="25.00" step="any" onchange="cartTotal(this);">
-									</div>
-								</div>
-								<div class="col-12">
-									<p class="cart-subtotal" id="pb-total">Total: $0</p>
+									<p class="cart-subtotal" id="tp-total">Total: $20</p>
 								</div>
 							</div>
 							<div class="row">
@@ -78,25 +38,6 @@
 							</div>
 
 		                    <h6 class="text-left">Shipping</h6>
-		                    <div>
-		                        <label for="shipping">Campus</label>
-		                        <input name="shipping" class="shipping" type="radio" value="campus" onClick="shippingMethod(this);">
-		                    </div>
-
-		                    <div id="campus" class="shipping-input" style="display:none;">
-		                        <select
-		                            required
-		                            class="form-control"
-		                            id="school"
-		                            name="school"
-		                            >
-		                            <option value="Yale">Yale</option>
-		                        </select>
-		                    </div>
-		                    <div>
-		                        <label for="shipping">Ground Shipping</label>
-		                        <input name="shipping" class="shipping" type="radio" required value="ground" checked="checked" onClick="shippingMethod(this);">
-		                    </div>
 		                    <div id="ground" class="shipping-input">
 		                        <div>
 		                            <label for="firstName">First Name</label>
@@ -131,7 +72,7 @@
 
 		                    <h3 class="text-left" id="total-price">Total: $20</h3>
 
-		                    <button type="submit" class="btn btn-primary btn-active">Submit</button>                    
+		                    <button type="button" class="btn btn-primary btn-active submit-order">Submit</button>                    
 
 		                </form>
 				</div>
