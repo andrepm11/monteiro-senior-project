@@ -7,13 +7,7 @@ function isLoggedIn(req, res, next) {
                 console.log(err);
             } else{
                 if(found){
-
-                    if(req.path!='/campuspickup' && req.path!='/campusfulfilled'){
-                        if(found.local.group != 'ADMIN'){
-                            res.redirect('/campuspickup?campus='+found.local.group);
-                        }
-                    }
-                    req.session.activeUser = found.local.email;
+                    req.session.activeUser = found.local.username;
                     return next();
                 }    
             }
