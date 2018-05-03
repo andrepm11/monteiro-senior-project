@@ -188,12 +188,6 @@
 			});
 		}
 
-		function bindEditCard(){
-			$('.edit-card').on('click', function(){
-				$('#new-message').text('You can edit your payment info here: https://monteiro-senior-project.herokuapp.com/updatepayment?phone='+$('#active-phone').data('phone'));
-			});
-		}
-
 		function bindSaveSidebar(){
 			$('.save-sidebar').on('click', function(){
 				var data = $('#personal-info').serializeArray().reduce(function(obj, item) {
