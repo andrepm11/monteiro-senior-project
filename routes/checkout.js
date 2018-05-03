@@ -442,6 +442,15 @@ router.post("/cart/web-charge", function(req,res){
                                                 }
                                             });
 
+                                            found.address = {
+                                                shippingAddress : {
+                                                    address1 : req.session.address1,
+                                                    address2 : req.session.address2,
+                                                    city : req.session.city,
+                                                    state : req.session.state,
+                                                    zip : req.session.zip
+                                                }
+                                            };
                                             found.firstName = req.session.firstName;
                                             found.lastName = req.session.lastName;
                                             found.email = req.session.email;
@@ -596,6 +605,15 @@ router.post("/cart/web-charge", function(req,res){
                                             found.totalOrders += 1;
                                             found.totalValue += charge.amount / 100;
                                             found.orders.push({'invoiceNumber':newOrder});
+                                            found.address = {
+                                                shippingAddress : {
+                                                    address1 : req.session.address1,
+                                                    address2 : req.session.address2,
+                                                    city : req.session.city,
+                                                    state : req.session.state,
+                                                    zip : req.session.zip
+                                                }
+                                            };
                                             found.card = {
                                                 last4 : charge.source.last4,
                                                 brand : charge.source.brand,
