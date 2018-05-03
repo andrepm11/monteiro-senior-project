@@ -95,6 +95,11 @@ app.post('/login', passport.authenticate('local-login',{
     // failureFlash : true // allow flash messages
 });
 
+app.get('/logout', function(req, res) {
+    req.logout();
+    res.redirect('/login');
+});
+
 app.get('/signup', function(req, res) {
 
     // render the page and pass in any flash data if it exists
