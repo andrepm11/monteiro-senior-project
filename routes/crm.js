@@ -178,6 +178,7 @@ router.get("/crm-chat", function(req,res){
 
     if(req.query.skip){
 
+
       TextCustomer.aggregate([
         {$match:{"phone":req.query.phone}},
         {$unwind : '$chat'},
@@ -191,6 +192,7 @@ router.get("/crm-chat", function(req,res){
             console.log('CRM ERROR 3');
             console.log(err);
           } else{
+            console.log(chats);
             if(chats.length){
               res.render('crm/partials/chat-loading', {found:chats,user:req.session.activeUser}, function(err, html){ res.send(html); });
             } else{
