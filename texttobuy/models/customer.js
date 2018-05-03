@@ -10,7 +10,8 @@ var textCustomerSchema = new db.Schema({
             sender : String,
             timestamp : Date,
             messageID : String,
-            status : String
+            status : String,
+            sentiment : String
         }
     ],
     totalOrders : Number,

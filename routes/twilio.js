@@ -33,6 +33,7 @@ var io = app.io;
 
 var slackPost = require("../slackPost.js");
 
+var sentiment = require('node-sentiment');
 
 
 
@@ -86,6 +87,8 @@ router.post("/twilio", function(req,res){
 				var time = new Date();
 				if(found){
 
+					console.log(sentiment(req.body.Body));
+
 					found.chat.push({
 						message : req.body.Body,
 						sender : 'Customer',
@@ -111,6 +114,8 @@ router.post("/twilio", function(req,res){
 					
 
 				} else{
+					console.log(sentiment(req.body.Body));
+
 					var firstReply = 'Thanks for texting! You can order by checking out online at monteiro-senior-project.herokuapp.com. Let me know if you have any questions!';
 
 					TextCustomer.create({

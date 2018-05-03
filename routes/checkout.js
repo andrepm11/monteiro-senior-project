@@ -25,6 +25,11 @@ var twilio  = require("twilio");
 var client = new twilio(accountSid, authToken);
 var MessagingResponse = require('twilio').twiml.MessagingResponse;
 
+var prices = {
+  'hs' : 20,
+  'hs-trial' : 2
+}
+
 router.post("/cart/addtocart", function(req,res){
 
   var addItem = {
@@ -32,7 +37,7 @@ router.post("/cart/addtocart", function(req,res){
     name:req.body.name,
     quantity:req.body.quantity,
     image:req.body.image,
-    price:2
+    price:prices[req.body.id]
   }
   if(req.session.items){
     var found = false;
@@ -88,6 +93,8 @@ router.post("/cart/removefromcart", function(req,res){
 
 
 router.post("/cart/set-session", function(req,res){
+
+  console.log(req.body);
 
 
   var success = true;
@@ -186,7 +193,29 @@ router.post("/validatephone", function(req,res){
   });
 });
 
+router.get("/get-session", function(req,res){
+  console.log(req.session);
 
+  var totalPrice = 0;
+  var totalQuantity = 0;
+  if(req.session.items){
+    req.session.items.forEach(function(item){
+        totalQuantity += (prices[item.id]/2)*item.quantity;
+        totalPrice += prices[item.id]*item.quantity;
+    });
+  }
+  totalQuantity = parseInt(totalQuantity);
+  console.log(totalPrice);
+  console.log(totalQuantity);
+  
+  res.sendStatus(200);
+});
+
+
+router.get("/reset-session", function(req,res){
+  resetSession(req);
+  res.sendStatus(200);
+});
 
 router.get("/cart", function(req,res){
 
@@ -194,7 +223,7 @@ router.get("/cart", function(req,res){
 
   var pass = {
     query : req.query,
-    price : 2,
+    // price : 2,
     firstName : req.session.firstName,
     lastName : req.session.lastName,
     email : req.session.email,
@@ -241,7 +270,7 @@ router.get("/cart-section", function(req,res){
 
   var pass = {
     query : req.query,
-    price : 2,
+    // price : 2,
     firstName : req.session.firstName,
     lastName : req.session.lastName,
     email : req.session.email,
@@ -331,8 +360,8 @@ router.post("/cart/web-charge", function(req,res){
                             var totalQuantity = 0;
                             var totalPrice = 0;
                             req.session.items.forEach(function(item){
-                                totalQuantity += item.quantity;
-                                totalPrice += 2*item.quantity;
+                                totalQuantity += item.quantity*(prices[item.id]/2);
+                                totalPrice += prices[item.id]*item.quantity;
                             });
                             totalQuantity = parseInt(totalQuantity);
 
@@ -345,9 +374,9 @@ router.post("/cart/web-charge", function(req,res){
                                 } else {
                                     if(order){
                                         var number = parseInt(order.invoiceNumber.substr(4))+1;
-                                        var newOrder = 'OSHT'+number.toString();
+                                        var newOrder = 'SAN'+number.toString();
                                     } else {
-                                        var newOrder = 'OSHT1000';
+                                        var newOrder = 'SAN1000';
                                     }
 
                                     stripe.charges.create({
@@ -367,7 +396,7 @@ router.post("/cart/web-charge", function(req,res){
                                         } else {
                                             var items = req.session.items;
                                             items.forEach(function(item){
-                                                item.price = 2;
+                                                item.price = prices[item.id];
                                                 item.totalPrice = item.quantity*item.price;
                                             });
 
@@ -478,8 +507,8 @@ router.post("/cart/web-charge", function(req,res){
                             var totalQuantity = 0;
                             var totalPrice = 0;
                             req.session.items.forEach(function(item){
-                                totalQuantity += item.quantity;
-                                totalPrice += 2*item.quantity;
+                                totalQuantity += item.quantity*(prices[item.id]/2);
+                                totalPrice += prices[item.id]*item.quantity;
                             });
                             totalQuantity = parseInt(totalQuantity);
 
@@ -492,9 +521,9 @@ router.post("/cart/web-charge", function(req,res){
                                 } else{
                                     if(order){
                                         var number = parseInt(order.invoiceNumber.substr(4))+1;
-                                        var newOrder = 'OSHT'+number.toString();
+                                        var newOrder = 'SAN'+number.toString();
                                     } else{
-                                        var newOrder = 'OSHT1000';
+                                        var newOrder = 'SAN1000';
                                     }
                                     stripe.charges.create({
                                         amount : Math.round(totalPrice*100),
@@ -513,7 +542,7 @@ router.post("/cart/web-charge", function(req,res){
 
                                             var items = req.session.items;
                                             items.forEach(function(item){
-                                                item.price = 20;
+                                                item.price = prices[item.id];
                                                 item.totalPrice = item.quantity*item.price;
                                             });
 
@@ -627,9 +656,9 @@ router.post("/cart/web-charge", function(req,res){
                             } else{
                                 if(order){
                                     var number = parseInt(order.invoiceNumber.substr(4))+1;
-                                    var newOrder = 'OSHT'+number.toString();
+                                    var newOrder = 'SAN'+number.toString();
                                 } else{
-                                    var newOrder = 'OSHT1000';
+                                    var newOrder = 'SAN1000';
                                 }
                             
                                 var customerId = customer.id;
@@ -637,8 +666,8 @@ router.post("/cart/web-charge", function(req,res){
                                 var totalQuantity = 0;
                                 var totalPrice = 0;
                                 req.session.items.forEach(function(item){
-                                    totalQuantity += item.quantity;
-                                    totalPrice += 2*item.quantity;
+                                    totalQuantity += item.quantity*(prices[item.id]/2);
+                                    totalPrice += prices[item.id]*item.quantity;
                                 });
                                 totalQuantity = parseInt(totalQuantity);
 
@@ -659,7 +688,7 @@ router.post("/cart/web-charge", function(req,res){
 
                                         var items = req.session.items;
                                         items.forEach(function(item){
-                                            item.price = 2;
+                                            item.price = prices[item.id];
                                             item.totalPrice = item.quantity*item.price;
                                         });
 
@@ -740,7 +769,7 @@ router.post("/cart/web-charge", function(req,res){
                                                 //ERROR
                                             } else {
                                                 
-                                              var firstText = 'Thanks for trying OHSHT, '+created.firstName+'! Just text us here when you’d like more.'
+                                              var firstText = 'Thanks for trying $anitize It, '+created.firstName+'! Just text me here when you’d like more.'
                                               client.messages.create({
                                                 body:firstText,
                                                 to:phone,
@@ -753,7 +782,6 @@ router.post("/cart/web-charge", function(req,res){
                                                       console.log(err);
                                                   } else {
                                                     console.log('sent first text');
-                                                      //TODO add message to a message database and add message ID to customer conversation, unwrap in CRM
                                                       created.chat.push({
                                                           message : firstText,
                                                           sender : 'Company',
@@ -819,7 +847,7 @@ router.post("/reorder", function(req,res){
                   var totalQuantity = 0;
                   var totalPrice = 0;
                   req.body.items.forEach(function(item){
-                      totalQuantity += item.quantity;
+                      totalQuantity += item.quantity*(prices[item.id]/2);
                       totalPrice += item.price*item.quantity;
                   });
                   totalQuantity = parseInt(totalQuantity);
@@ -833,9 +861,9 @@ router.post("/reorder", function(req,res){
                       } else {
                           if(order){
                               var number = parseInt(order.invoiceNumber.substr(4))+1;
-                              var newOrder = 'OSHT'+number.toString();
+                              var newOrder = 'SAN'+number.toString();
                           } else {
-                              var newOrder = 'OSHT1000';
+                              var newOrder = 'SAN1000';
                           }
                           // var price = req.body.price;
                           stripe.charges.create({
@@ -900,7 +928,7 @@ router.post("/reorder", function(req,res){
                                   found.totalValue += charge.amount / 100;
                                   found.orders.push({'invoiceNumber':newOrder});
 
-                                  var messageBody = 'Your order of TP Packs has been completed! We\'ll let you know once they\'ve shipped.';
+                                  var messageBody = 'Your order of Hand Sanitizer has been completed! We\'ll let you know once they\'ve shipped.';
                                   
 
                                   client.messages.create({

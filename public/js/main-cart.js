@@ -143,7 +143,26 @@ function changeQuantity(obj){
 
 
 
+$('#zip').on('change',function(){
 
+	var url = "/cart/set-session";
+	var data = {
+		firstName : $('#firstName').val(),
+		lastName : $('#lastName').val(),
+		email : $('#email').val(),
+		address1 : $('#address1').val(),
+		address2 : $('#address2').val(),
+		city : $('#city').val(),
+		state : $('#state').val(),
+		zip : $('#zip').val(),
+		
+		
+	};
+	console.log(data);
+	console.log($('#firstName'));
+	cartPost(url, data, function(){console.log('posted');});
+	
+});
 
 
 
@@ -261,9 +280,6 @@ function stopLoading(){
 
 function paymentFormSubmit(){
 	var url = "/cart/web-charge";
-
-	// $('#complete-order').prop('disabled', true);
-	// $('#complete-order').addClass('disabled');
 
 	var i=0;
 	var items = [];
@@ -389,8 +405,7 @@ $("#phone").on("change keyup paste", function () {
 
 $(".form-control").on("change", function () {
 
-	// console.log($(this));
-	var attributeId = $(this).attr("id");
+	// var attributeId = $(this).attr("id");
 
 	console.log('here');
 
@@ -406,108 +421,16 @@ $(".form-control").on("change", function () {
 		},150);
 
 	} else if($(this).attr("id") != 'card-element'){
-		var url = "/cart/set-session";
-		var data = {
-		};
-		data[attributeId] = $(this).val();
-		cartPost(url, data, function(){});
+		// var url = "/cart/set-session";
+		// var data = {
+		// };
+		// data[attributeId] = $(this).val();
+		// console.log(data);
+		// cartPost(url, data, function(){});
 
 	}
     
 });
-
-// $('.cart-plus').on('click', function(){
-// 	var quant = parseInt($($($(this).parent()).children()[1]).text());
-// 	$($($(this).parent()).children()[1]).html(quant+1);
-
-// 	var priceObj = $($($(this).parent()).next()).children()[0];
-
-// 	var price = $(priceObj).data('price');
-// 	$(priceObj).text('$'+(price*(quant+1)));
-
-// 	$(".cart-total").text('$'+(parseFloat($(".cart-total").text().substr(1))+parseFloat(price)).toFixed(2));
-// 	// console.log($($($($($(this).parent()).parent()).children()[2]).children()[0]);
-// });
-// $('.cart-minus').on('click', function(evt){
-// 	if($(this).parent().children().length == 2){
-// 		var obj = $($($(this).parent()).children()[0]);
-// 		var quant = obj.text();
-// 		var itemId = obj.data('id');
-// 	} else {
-// 		var quant = parseInt($($($(this).parent()).children()[1]).text());
-// 	}
-
-// 	if(quant == 'Trial'){
-// 		var priceObj = $($($(this).parent()).next()).children()[0];
-
-// 		var price = $(priceObj).data('price');
-		
-
-// 		$(".cart-total").text('$'+(parseFloat($(".cart-total").text().substr(1))-price).toFixed(2));
-
-// 		removeFromCart(itemId);
-
-// 		$($($($(this).parent()).parent()).parent()).parent().remove();
-
-
-
-// 		if(!$('.cart-product').length){
-// 			$('#cart').css('display','none');
-// 			$('#no-cart').css('display','block');
-// 		}
-		
-// 	} else if( quant > 1){
-		
-// 		$($($(this).parent()).children()[1]).html(quant-1);
-// 		var priceObj = $($($(this).parent()).next()).children()[0];
-
-// 		var price = $(priceObj).data('price');
-// 		$(priceObj).text('$'+(price*(quant-1)));
-
-// 		$(".cart-total").text('$'+(parseFloat($(".cart-total").text().substr(1))-price).toFixed(2));
-
-// 	} else {
-// 		var priceObj = $($($(this).parent()).next()).children()[0];
-
-
-// 		var price = $(priceObj).data('price');
-		
-// 		var itemId = $($(this).next()).data('id');
-// 		$(".cart-total").text('$'+(parseFloat($(".cart-total").text().substr(1))-price).toFixed(2));
-
-// 		removeFromCart(itemId);
-
-
-// 		$($($($(this).parent()).parent()).parent()).parent().remove();
-		
-// 		if(!$('.cart-product').length){
-// 			$('#cart').css('display','none');
-// 			$('#no-cart').css('display','block');
-// 		}
-
-// 		// Delete this
-// 		// $($($(this).parent()).children()[1]).html(quant-1);
-// 	}
-// 	// $($($(this).parent()).children()[1]).html('hey');
-// });
-
-// function removeFromCart(id){
-// 	var url="/cart/removefromcart";
-// 	var data = {
-// 		"id":id
-// 	}
-// 	setTimeout(function(){
-// 		cartPost(url,data,function(){});
-// 	},150);
-// }
-
-// $('#orderSummaryBtn').on('click', function(evt){
-// 	if($(this).hasClass('collapsed')){
-// 		$('#orderSummaryText').html('Hide order summary &and;');
-// 	} else{
-// 		$('#orderSummaryText').html('Show order summary &or;');
-// 	}
-// });
 
 $("#phone").on("focus", function (e) {
 	$(this).setCursorPosition(100);

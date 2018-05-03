@@ -29,17 +29,13 @@ var fs = require('fs');
 
 router.get("/dashboard", isLoggedIn, function(req,res){
     var dashboardData = {};
-    var finished = _.after(10, doRender);
+    var finished = _.after(9, doRender);
 
     TextCustomer.aggregate(
     [{$match:
-        {$and:[
-            {"firstName":
-                {$ne:"Customer"}
-            },
-            {"phone":
-                {$ne:"7863008768"}}
-        ]}
+        {"firstName":
+            {$ne:"Customer"}
+        }
     },
     {"$project":
         {
@@ -52,8 +48,10 @@ router.get("/dashboard", isLoggedIn, function(req,res){
         if(err){
             console.log(err);
         } else {
+            console.log(agg);
             if(agg[0]){
                 dashboardData.textsPerOrderBought = agg[0].totalTexts / agg[0].totalOrders;
+                console.log('here');
             } else{
                 dashboardData.textsPerOrderBought = 0;
             }
@@ -64,13 +62,9 @@ router.get("/dashboard", isLoggedIn, function(req,res){
 
     TextCustomer.aggregate(
     [{$match:
-        {$and:[
-            {"firstName":
-                {$ne:""}
-            },
-            {"phone":
-                {$ne:"7863008768"}}
-        ]}
+        {"firstName":
+            {$ne:""}
+        }
     },
     {"$project":
         {
@@ -93,21 +87,21 @@ router.get("/dashboard", isLoggedIn, function(req,res){
         }
     });
 
-    TextOrder.aggregate([{$match:{"orderType":{$ne:""}}},{ "$group":{ "_id":null, "avg_value":{"$avg":"$paid"}, count:{"$sum":1}}}], function(err,agg){
-        if(err){
-            console.log(err);
-        } else {
-            if(agg[0]){
-                dashboardData.barsPerOrder = agg[0].avg_value;
-                dashboardData.totalOrders = agg[0].count;    
-            } else {
-                dashboardData.barsPerOrder = 0;
-                dashboardData.totalOrders = 0;
-            }
+    // TextOrder.aggregate([{$match:{"orderType":{$ne:""}}},{ "$group":{ "_id":null, "avg_value":{"$avg":"$paid"}, count:{"$sum":1}}}], function(err,agg){
+    //     if(err){
+    //         console.log(err);
+    //     } else {
+    //         if(agg[0]){
+    //             dashboardData.paidPerOrder = agg[0].avg_value;
+    //             dashboardData.totalOrders = agg[0].count;    
+    //         } else {
+    //             dashboardData.paidPerOrder = 0;
+    //             dashboardData.totalOrders = 0;
+    //         }
 
-            finished();
-        }
-    });
+    //         finished();
+    //     }
+    // });
 
     TextCustomer.count({}, function(err,count){
         if(err){
@@ -127,7 +121,7 @@ router.get("/dashboard", isLoggedIn, function(req,res){
     });
 
     var graph = {};
-    TextOrder.aggregate([{ "$group":{ "_id":'$totalBars', count:{$sum:1}}},{"$sort":{"_id":1}}], function(err,agg){
+    TextOrder.aggregate([{ "$group":{ "_id":'$totalQuant', count:{$sum:1}}},{"$sort":{"_id":1}}], function(err,agg){
         if(err){
             console.log(err);
         } else{
@@ -176,6 +170,7 @@ router.get("/dashboard", isLoggedIn, function(req,res){
         } else{
             
             var days = {};
+            console.log(agg);
             if(agg[1]){
                 days['Monday'] = agg[1]['count'];
                 days['Tuesday'] = agg[2]['count'];
@@ -186,21 +181,22 @@ router.get("/dashboard", isLoggedIn, function(req,res){
                 days['Sunday'] = agg[0]['count'];
             }
 
+
             graph.days = days;
+            console.log(graph);
             finished();
         }
     });
 
 
     TextOrder.aggregate([
-    { "$match" : {"invoiceNumber":{"$gt":"VRB1107"}}},
     { "$project": {
         "year": { "$year": { "$subtract": [ "$completionDate", 5 * 60 * 60 * 1000 ] } }, 
         "month": { "$month": { "$subtract": [ "$completionDate", 5 * 60 * 60 * 1000 ] } }, 
         "day": { "$dayOfMonth": { "$subtract": [ "$completionDate", 5 * 60 * 60 * 1000 ] } },
         "paid":"$paid",
-        "fullcustomer" : {"$gt":["$paid",3.95]},
-        "trial" : {"$lte":["$paid",3.95]}
+        "fullcustomer" : {"$gt":["$paid",2]},
+        "trial" : {"$lte":["$paid",2]}
     } },
     { "$group":{"_id": {
                     year : "$year" ,        
@@ -246,7 +242,7 @@ router.get("/dashboard", isLoggedIn, function(req,res){
     
     TextOrder.aggregate([
     { "$match" : {"completionDate":{$gte:new Date(firstDay)}}},
-    { "$group":{"_id": {"$gt":["$paid",3.95]},count:{$sum:1},revenue:{$sum:"$paid"}, boxesSold:{$sum:{ "$trunc":{"$divide":["$totalBars",10]}}}}}
+    { "$group":{"_id": {"$gt":["$paid",2]},count:{$sum:1},revenue:{$sum:"$paid"}, packsSold:{$sum:{ "$trunc":{"$divide":["$totalQuant",10]}}}}}
     ],
     function(err,agg){
         if(err){
@@ -254,15 +250,15 @@ router.get("/dashboard", isLoggedIn, function(req,res){
         } else{
 
             if(!agg[0]){
-                agg.unshift({'revenue':0,'count':0,'boxesSold':0});
+                agg.unshift({'revenue':0,'count':0,'packsSold':0});
             }
             
             if(!agg[1]){
                 if(agg[0]){
                     if(agg[0]['boxesSold']){
-                        agg.push({'revenue':0,'count':0,'boxesSold':0})
+                        agg.push({'revenue':0,'count':0,'packsSold':0})
                     } else {
-                        agg.unshift({'revenue':0,'count':0,'boxesSold':0})
+                        agg.unshift({'revenue':0,'count':0,'packsSold':0})
                     }
                 }
             }
@@ -276,7 +272,7 @@ router.get("/dashboard", isLoggedIn, function(req,res){
                     full : {
                         'revenue' : agg[0]['revenue'],
                         'count' : agg[0]['count'],
-                        'totalBoxes' : agg[0]['boxesSold']
+                        'totalBoxes' : agg[0]['packsSold']
                     }
                 };
             } 
@@ -285,22 +281,6 @@ router.get("/dashboard", isLoggedIn, function(req,res){
         }
     });
 
-
-    // var twoWeeksBack = new Date(+new Date - 12096e5);
-
-    // TextOrder.aggregate([
-    // { "$match" : {"$and":[{"invoiceNumber":{"$gt":"VRB1107"}},{"completionDate":{"$lt":twoWeeksBack}}]}},
-    // { "$group":{"_id": { customer : "$customerPhone"},orders:{"$push":{invoiceNumber:"$invoiceNumber",paid:"$paid",completionDate:"$completionDate"}}, count:{$sum:1},revenue:{$sum:"$paid"}}},{"$sort":{"orders.completionDate":1}},
-    // ],
-    // function(err,agg){
-    //     if(err){
-    //         console.log(err);
-    //     } else{
-
-    //         console.log(agg[0].orders);
-    //         console.log(agg.length);
-    //     }
-    // });
 
 
 
