@@ -132,7 +132,6 @@
     function timeoutFunction() {  
 		typing = false;
 		socket.emit('notTyping', {typing:typing});
-		console.log('bleh');
 	}
 	var timeout = undefined;
 
@@ -150,7 +149,6 @@
 	});
 
 	socket.on("isTyping", function(data) {  
-		console.log(data);
 		console.log('typing');
 		if(data.conversation == $('#active-phone').data('phone')){
     		$('#someone-typing').text(data.user+' is typing...');

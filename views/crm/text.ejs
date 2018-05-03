@@ -305,7 +305,6 @@
 		function bindConversation(){         
 			$('#conversation-body').scroll(function(){
 			    if ($('#conversation-body').scrollTop() == 0){
-			    	console.log('he');
 			        var url='/crm-chat?skip='+skip+'&phone='+$('#active-phone').data('phone');
 			        $.ajax({ 
 						type: 'GET', 
