@@ -43,7 +43,7 @@
 					<% } else if(message.sentiment == 'negative'){ %>
 						<div class="text-bubble customer-text" style="background-color:#c62825;">
 					<% } %>
-						<% if(message.mediaURL){ %>
+						<% if(message.mediaURL && message.mediaURL == message.message){ %>
 							<img class="thumbnail" src="<%=message.mediaURL%>">
 						<% } else { %>
 							<%= message.message %>
