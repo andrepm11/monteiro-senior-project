@@ -451,6 +451,7 @@ router.post("/cart/web-charge", function(req,res){
                                                     zip : req.session.zip
                                                 }
                                             };
+                                            found.lastInteraction = new Date();
                                             found.firstName = req.session.firstName;
                                             found.lastName = req.session.lastName;
                                             found.email = req.session.email;
@@ -598,7 +599,7 @@ router.post("/cart/web-charge", function(req,res){
                                                 }
                                             });
 
-                                           
+                                            found.lastInteraction = new Date();
                                             found.firstName = req.session.firstName;
                                             found.lastName = req.session.lastName;
                                             found.email = req.session.email;
@@ -802,7 +803,6 @@ router.post("/cart/web-charge", function(req,res){
                                                       console.log('Phone: '+phone);
                                                       console.log(err);
                                                   } else {
-                                                    console.log('sent first text');
                                                       created.chat.push({
                                                           message : firstText,
                                                           sender : 'Company',
@@ -810,7 +810,7 @@ router.post("/cart/web-charge", function(req,res){
                                                           messageID : message.sid,
                                                           status : 'pending'
                                                       });
-                                                      console.log('added first text to DB');
+                                                      created.lastInteraction = new Date();
                                                       created.save();
                                                   }
                                               }); 
@@ -835,7 +835,6 @@ router.post("/cart/web-charge", function(req,res){
                                                           messageID : message.sid,
                                                           status : 'pending'
                                                       });
-                                                      console.log('added second text to db');
                                                       created.lastInteraction = new Date();
                                                       created.save();
                                                   }
