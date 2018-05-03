@@ -17,7 +17,7 @@ module.exports = {
     io : io
 };
 
-// app.use(favicon('./favicon-96x96.png'));
+app.use(favicon('./favicon-96x96.png'));
 
 var isLoggedIn = require("./isLoggedIn.js");
 
@@ -112,5 +112,5 @@ app.get("*", function(req,res){
 });
 
 http.listen(process.env.PORT,process.env.IP,function(){
-    console.log("Verb is listening . . .");
+    console.log("Andre is listening . . .");
 });

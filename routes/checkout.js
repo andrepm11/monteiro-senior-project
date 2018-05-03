@@ -32,7 +32,7 @@ router.post("/cart/addtocart", function(req,res){
     name:req.body.name,
     quantity:req.body.quantity,
     image:req.body.image,
-    price:20
+    price:2
   }
   if(req.session.items){
     var found = false;
@@ -49,7 +49,6 @@ router.post("/cart/addtocart", function(req,res){
     });
     if(!found){
       req.session.items.push(addItem);
-      // req.session.totalPrice += req.body.quantity*req.body.price;
     }
     if(!trial){
       req.session.cartTotal += req.body.quantity*20
@@ -58,8 +57,6 @@ router.post("/cart/addtocart", function(req,res){
     req.session.items = [addItem];
     req.session.cartTotal = req.body.quantity*20
   }
-  // req.session.items = 0;
-  // res.sendStatus(200);
   res.send({result:"success"});
 });
 
@@ -197,7 +194,7 @@ router.get("/cart", function(req,res){
 
   var pass = {
     query : req.query,
-    price : 20,
+    price : 2,
     firstName : req.session.firstName,
     lastName : req.session.lastName,
     email : req.session.email,
@@ -244,7 +241,7 @@ router.get("/cart-section", function(req,res){
 
   var pass = {
     query : req.query,
-    price : 20,
+    price : 2,
     firstName : req.session.firstName,
     lastName : req.session.lastName,
     email : req.session.email,
@@ -335,7 +332,7 @@ router.post("/cart/web-charge", function(req,res){
                             var totalPrice = 0;
                             req.session.items.forEach(function(item){
                                 totalQuantity += item.quantity;
-                                totalPrice += 20*item.quantity;
+                                totalPrice += 2*item.quantity;
                             });
                             totalQuantity = parseInt(totalQuantity);
 
@@ -370,7 +367,7 @@ router.post("/cart/web-charge", function(req,res){
                                         } else {
                                             var items = req.session.items;
                                             items.forEach(function(item){
-                                                item.price = 20;
+                                                item.price = 2;
                                                 item.totalPrice = item.quantity*item.price;
                                             });
 
@@ -388,8 +385,8 @@ router.post("/cart/web-charge", function(req,res){
                                                 customerPhone : req.session.phone,
                                                 stripeCharge : charge.id,
                                                 items : items,
-                                                totalPacks : totalQuantity,
-                                                pricePerPack : totalPrice / totalQuantity,
+                                                totalQuant : totalQuantity,
+                                                pricePerQuant : totalPrice / totalQuantity,
                                                 address : {
                                                     address1 : req.session.address1,
                                                     address2 : req.session.address2,
@@ -482,7 +479,7 @@ router.post("/cart/web-charge", function(req,res){
                             var totalPrice = 0;
                             req.session.items.forEach(function(item){
                                 totalQuantity += item.quantity;
-                                totalPrice += 20*item.quantity;
+                                totalPrice += 2*item.quantity;
                             });
                             totalQuantity = parseInt(totalQuantity);
 
@@ -534,8 +531,8 @@ router.post("/cart/web-charge", function(req,res){
                                                 customerPhone : req.session.phone,
                                                 stripeCharge : charge.id,
                                                 items : items,
-                                                totalPacks : totalQuantity,
-                                                pricePerPack : totalPrice / totalQuantity,
+                                                totalQuant : totalQuantity,
+                                                pricePerQuant : totalPrice / totalQuantity,
                                                 address : {
                                                     address1 : req.body.address1,
                                                     address2 : req.body.address2,
@@ -641,7 +638,7 @@ router.post("/cart/web-charge", function(req,res){
                                 var totalPrice = 0;
                                 req.session.items.forEach(function(item){
                                     totalQuantity += item.quantity;
-                                    totalPrice += 20*item.quantity;
+                                    totalPrice += 2*item.quantity;
                                 });
                                 totalQuantity = parseInt(totalQuantity);
 
@@ -662,7 +659,7 @@ router.post("/cart/web-charge", function(req,res){
 
                                         var items = req.session.items;
                                         items.forEach(function(item){
-                                            item.price = 20;
+                                            item.price = 2;
                                             item.totalPrice = item.quantity*item.price;
                                         });
 
@@ -695,8 +692,8 @@ router.post("/cart/web-charge", function(req,res){
                                             customerPhone : req.session.phone,
                                             stripeCharge : charge.id,
                                             items : items,
-                                            totalPacks : totalQuantity,
-                                            pricePerPack : totalPrice / totalQuantity,
+                                            totalQuant : totalQuantity,
+                                            pricePerQuant : totalPrice / totalQuantity,
                                             address : {
                                                 address1 : req.body.address1,
                                                 address2 : req.body.address2,
@@ -872,8 +869,8 @@ router.post("/reorder", function(req,res){
                                       customerPhone : found.phone,
                                       stripeCharge : charge.id,
                                       items : items,
-                                      totalPacks : totalQuantity,
-                                      pricePerPack : totalPrice / totalQuantity,
+                                      totalQuant : totalQuantity,
+                                      pricePerQuant : totalPrice / totalQuantity,
                                       address : {
                                           address1 : req.body.address1,
                                           address2 : req.body.address2,
@@ -944,23 +941,19 @@ router.post("/reorder", function(req,res){
 
 function resetSession(req){
 
-    delete req.session;
 
-    // req.session.cartTotal = 0;
-    // req.session.firstName = '';
-    // req.session.lastName = '';
-    // req.session.email = '';
-    // req.session.phone = '';
-    // req.session.address1 = '';
-    // req.session.address2 = '';
-    // req.session.city = '';
-    // req.session.state = '';
-    // req.session.zip = '';
-    // req.session.school = '';
-    // req.session.error = '';
-    // req.session.items=[];
-    // req.session.src = '';
-    // delete req.session.promocode;
+    req.session.cartTotal = 0;
+    req.session.firstName = '';
+    req.session.lastName = '';
+    req.session.email = '';
+    req.session.phone = '';
+    req.session.address1 = '';
+    req.session.address2 = '';
+    req.session.city = '';
+    req.session.state = '';
+    req.session.zip = '';
+    req.session.error = '';
+    req.session.items=[];
 
 }
 

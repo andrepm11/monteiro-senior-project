@@ -24,22 +24,9 @@ var textCustomerSchema = new db.Schema({
     },
     created : Date,
     firstName : String,
-    firstNameNormalized:String,
     lastName : String,
-    lastNameNormalized:String,
-    fullNameNormalized:String,
     email : String,
-    school : String,
     address : {
-        billingAddress : {
-            name : String,
-            address1 : String,
-            address2 : String,
-            city : String,
-            state : String,
-            zip : String,
-            country : String
-        },
         shippingAddress : {
             name : String,
             address1 : String,
@@ -55,15 +42,11 @@ var textCustomerSchema = new db.Schema({
     conversionDate : Date,
     lastInteraction : Date,
     waitingOnResponse : Boolean,
-    textBlast : Boolean,
     lastOrder : Date,
     dontText : Boolean,
     flagged : Boolean,
-    flexPlans : [{ type : db.Schema.Types.ObjectId, ref: 'FlexPlan' }]
 });
 
-// textCustomerSchema.index({'$**': 'text'});
-// textCustomerSchema.index({ firstName:'text',lastName:'text',chat:'text'}, {name: 'My text index', weights: {firstName: 10, lastName: 10, chat:5}});
 textCustomerSchema.index({ firstName:'text',lastName:'text',chat:'text'}, {name: 'My text index', weights: {firstName: 100, lastName: 100, chat:5}});
 
 
@@ -87,8 +70,8 @@ var textOrderSchema = new db.Schema({
         }
     ],
     paid : Number,
-    totalPacks : Number,
-    pricePerPack : Number
+    totalQuant : Number,
+    pricePerQuant : Number
 });
 
 

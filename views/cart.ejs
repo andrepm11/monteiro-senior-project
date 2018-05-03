@@ -3,7 +3,7 @@
 <head>
   
   <meta charset="utf-8">
-  <title>Verb Energy</title>
+  <title>Monteiro CPSC490</title>
   <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0' name='viewport' />
   <meta name="description" content="
                                     No jitters. No crash. No chemicals. Just focused, all-day, feel-good energy. 
@@ -65,7 +65,7 @@
 
 		<div class="row pt-4 pb-1">
 			<div class="col-12">
-				<h2 class="text-center title"><a href="/">OH S#!T</a></h2>
+				<h2 class="text-center title"><a href="/">$anitize It</a></h2>
 			</div>
 		</div>
 	<% if(items && items[0]){ %>
@@ -106,7 +106,7 @@
 						<div class="col-12">
 							<div id="phone-alert" class="alert-div">
 							</div>
-							<input id="phone" autocomplete="off" required type="tel" class="form-control" name="phone" value="+1 (<% if(phone && phone.length>10){ %><%= phone.substr(4) %><% } else if(phone && phone.length==10){ %><%=phone%><%}%>" <% if(query.phone){%>readonly<%} %> data-next="payment-shipping" placeholder="Mobile Phone Number">
+							<input id="phone" autocomplete="user-phone" required type="tel" class="form-control" name="phone" value="+1 (<% if(phone && phone.length>10){ %><%= phone.substr(4) %><% } else if(phone && phone.length==10){ %><%=phone%><%}%>" <% if(query.phone){%>readonly<%} %> data-next="payment-shipping" placeholder="Mobile Phone Number">
 						</div>
 					</div>
 				</div>

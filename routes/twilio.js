@@ -111,7 +111,7 @@ router.post("/twilio", function(req,res){
 					
 
 				} else{
-					var firstReply = 'Thanks for texting! You can order TP by checking out online at monteiro-senior-project.herokuapp.com. Let me know if you have any questions!';
+					var firstReply = 'Thanks for texting! You can order by checking out online at monteiro-senior-project.herokuapp.com. Let me know if you have any questions!';
 
 					TextCustomer.create({
 						phone : req.body.From,
