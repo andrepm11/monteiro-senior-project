@@ -299,6 +299,7 @@ router.get("/cart-section", function(req,res){
 
 router.post("/cart/web-charge", function(req,res){
 
+
     for (var key in req.body) {
       if(typeof req.body[key] == 'string'){
           if(key == 'phone'){
@@ -465,6 +466,20 @@ router.post("/cart/web-charge", function(req,res){
                                                 exp_year : charge.source.exp_year
                                             };
 
+                                            var text = 'Order '+newOrder+ ' - '+found.firstName+' '+found.lastName+'. ';
+                                            var payloads=[];
+                                            var payload = {
+                                                token : process.env.SLACKTOKEN,
+                                                channel : process.env.NOTIFYSLACK,
+                                                text : text,
+                                                as_user : false,
+                                                username : 'Notify Bot'
+                                            };
+                                            payloads.push(payload);
+
+                                            slackPost('chat.postMessage', payloads);
+                                            
+
                                             var messageBody = 'Your order has been completed! Just text us if you ever want more hand sanitizer.';
 
                                             var phone = req.session.phone;
@@ -621,6 +636,18 @@ router.post("/cart/web-charge", function(req,res){
                                                 exp_month : charge.source.exp_month,
                                                 exp_year : charge.source.exp_year
                                             };
+                                            var text = 'Order '+newOrder+ ' - '+found.firstName+' '+found.lastName+'. ';
+                                            var payloads=[];
+                                            var payload = {
+                                                token : process.env.SLACKTOKEN,
+                                                channel : process.env.NOTIFYSLACK,
+                                                text : text,
+                                                as_user : false,
+                                                username : 'Notify Bot'
+                                            };
+                                            payloads.push(payload);
+
+                                            slackPost('chat.postMessage', payloads);
                                             
                                             var messageBody = 'Your order of Hand Sanitizer has been completed! Your payment method is now securely linked to your phone number. If you want to place another order, just text me at this number (sms:786-460-3490) saying that you want more Hand Sanitizer and it\'ll ship out the next day.';
 
@@ -779,6 +806,18 @@ router.post("/cart/web-charge", function(req,res){
                                             }
                                         };
 
+                                         var text = 'Order '+newOrder+ ' - '+req.session.firstName+' '+req.session.lastName+'. ';
+                                        var payloads=[];
+                                        var payload = {
+                                            token : process.env.SLACKTOKEN,
+                                            channel : process.env.NOTIFYSLACK,
+                                            text : text,
+                                            as_user : false,
+                                            username : 'Notify Bot'
+                                        };
+                                        payloads.push(payload);
+
+                                        slackPost('chat.postMessage', payloads);
 
                                         var phone = req.session.phone;
                                         resetSession(req);

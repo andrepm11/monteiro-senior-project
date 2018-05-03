@@ -29,7 +29,7 @@ var fs = require('fs');
 
 router.get("/dashboard", isLoggedIn, function(req,res){
     var dashboardData = {};
-    var finished = _.after(10, doRender);
+    var finished = _.after(11, doRender);
 
     TextCustomer.aggregate(
     [{$match:
@@ -109,21 +109,25 @@ router.get("/dashboard", isLoggedIn, function(req,res){
         }
     });
 
-    // TextOrder.aggregate([{$match:{"orderType":{$ne:""}}},{ "$group":{ "_id":null, "avg_value":{"$avg":"$paid"}, count:{"$sum":1}}}], function(err,agg){
-    //     if(err){
-    //         console.log(err);
-    //     } else {
-    //         if(agg[0]){
-    //             dashboardData.paidPerOrder = agg[0].avg_value;
-    //             dashboardData.totalOrders = agg[0].count;    
-    //         } else {
-    //             dashboardData.paidPerOrder = 0;
-    //             dashboardData.totalOrders = 0;
-    //         }
+    TextOrder.aggregate([{ "$group":{ "_id":null, "avg_value":{"$avg":"$paid"}, count:{"$sum":1}}}], function(err,agg){
+        if(err){
+            console.log(err);
+        } else {
 
-    //         finished();
-    //     }
-    // });
+            console.log(agg);
+
+
+            if(agg[0]){
+                dashboardData.paidPerOrder = agg[0].avg_value;
+                dashboardData.totalOrders = agg[0].count;    
+            } else {
+                dashboardData.paidPerOrder = 0;
+                dashboardData.totalOrders = 0;
+            }
+
+            finished();
+        }
+    });
 
     TextCustomer.count({}, function(err,count){
         if(err){
