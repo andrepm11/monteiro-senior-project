@@ -363,6 +363,7 @@ router.post("/cart/web-charge", function(req,res){
                                 totalQuantity += item.quantity*(prices[item.id]/2);
                                 totalPrice += prices[item.id]*item.quantity;
                             });
+                            console.log(totalPrice);
                             totalQuantity = parseInt(totalQuantity);
 
                             TextOrder.findOne({}, null, {sort:{"invoiceNumber":-1}}, function(err,order){
@@ -510,6 +511,7 @@ router.post("/cart/web-charge", function(req,res){
                                 totalQuantity += item.quantity*(prices[item.id]/2);
                                 totalPrice += prices[item.id]*item.quantity;
                             });
+                            console.log(totalPrice);
                             totalQuantity = parseInt(totalQuantity);
 
 
@@ -669,6 +671,7 @@ router.post("/cart/web-charge", function(req,res){
                                     totalQuantity += item.quantity*(prices[item.id]/2);
                                     totalPrice += prices[item.id]*item.quantity;
                                 });
+                                console.log(totalPrice);
                                 totalQuantity = parseInt(totalQuantity);
 
                                 stripe.charges.create({
