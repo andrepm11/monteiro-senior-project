@@ -111,6 +111,9 @@
     	$('#'+data.phone).remove();
     	$('#conversation-list').prepend(chatPreview);
 
+    	$('.chat-preview').off('click');
+    	// bindChatPreview();
+
 
     	if(data.phone == $('#active-phone').data('phone')){
     		$(html).insertBefore('#typing-row');
