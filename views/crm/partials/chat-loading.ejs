@@ -15,7 +15,14 @@
 					<%= message.chat.timestamp %>
 				</div>
 			<% } else { %>
-				<div class="text-bubble customer-text">
+
+				<% if(message.chat.sentiment == 'positive'){ %>
+					<div class="text-bubble customer-text" style="background-color:#27c431;">
+				<% } else if(message.chat.sentiment == 'neutral'){ %>
+					<div class="text-bubble customer-text">
+				<% } else if(message.chat.sentiment == 'negative'){ %>
+					<div class="text-bubble customer-text" style="background-color:#c62825;">
+				<% } %>
 					<% if(message.chat.mediaURL){ %>
 							<img class="thumbnail" src="<%=message.chat.mediaURL%>">
 						<% } else { %>

@@ -454,7 +454,7 @@ router.post("/cart/web-charge", function(req,res){
                                                 exp_year : charge.source.exp_year
                                             };
 
-                                            var messageBody = 'Your order has been completed! Just text us if you ever want more toilet paper.';
+                                            var messageBody = 'Your order has been completed! Just text us if you ever want more hand sanitizer.';
 
                                             var phone = req.session.phone;
                                             client.messages.create({
@@ -601,7 +601,7 @@ router.post("/cart/web-charge", function(req,res){
                                                 exp_year : charge.source.exp_year
                                             };
                                             
-                                            var messageBody = 'Your order of Toilet Paper has been completed! Your payment method is now securely linked to your phone number. If you want to place another order, just text me at this number (sms:786-460-3490) saying that you want more Toilet Paper and it\'ll ship out the next day.';
+                                            var messageBody = 'Your order of Hand Sanitizer has been completed! Your payment method is now securely linked to your phone number. If you want to place another order, just text me at this number (sms:786-460-3490) saying that you want more Hand Sanitizer and it\'ll ship out the next day.';
 
                                             client.messages.create({
                                                 body:messageBody,

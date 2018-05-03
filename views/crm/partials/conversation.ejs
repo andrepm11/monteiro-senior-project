@@ -36,7 +36,13 @@
 						<%= message.timestamp %> - <%= message.status%>
 					</div>
 				<% } else { %>
-					<div class="text-bubble customer-text text-center">
+					<% if(message.sentiment == 'positive'){ %>
+						<div class="text-bubble customer-text" style="background-color:#27c431;">
+					<% } else if(message.sentiment == 'neutral'){ %>
+						<div class="text-bubble customer-text">
+					<% } else if(message.sentiment == 'negative'){ %>
+						<div class="text-bubble customer-text" style="background-color:#c62825;">
+					<% } %>
 						<% if(message.mediaURL){ %>
 							<img class="thumbnail" src="<%=message.mediaURL%>">
 						<% } else { %>

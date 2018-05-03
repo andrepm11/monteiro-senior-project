@@ -29,7 +29,7 @@ var fs = require('fs');
 
 router.get("/dashboard", isLoggedIn, function(req,res){
     var dashboardData = {};
-    var finished = _.after(9, doRender);
+    var finished = _.after(10, doRender);
 
     TextCustomer.aggregate(
     [{$match:
@@ -55,6 +55,28 @@ router.get("/dashboard", isLoggedIn, function(req,res){
             } else{
                 dashboardData.textsPerOrderBought = 0;
             }
+            finished();
+
+        }
+    });
+
+    TextCustomer.aggregate(
+    [{$unwind: '$chat'},
+    {$group: {_id: '$chat.sentiment', sum: {$sum: 1}}}],
+    function(err,agg){
+        if(err){
+            console.log(err);
+        } else {
+            console.log(agg);
+            var sent = {};
+            agg.forEach(function(sentiment){
+                sent[sentiment['_id']] = sentiment['sum'];
+            })
+            console.log(sent);
+            dashboardData.positiveTexts = sent['positive'];
+            dashboardData.negativeTexts = sent['negative'];
+            dashboardData.neutralTexts = sent['neutral'];
+            dashboardData.totalTexts = sent['positive']+sent['negative']+sent['neutral'];
             finished();
 
         }

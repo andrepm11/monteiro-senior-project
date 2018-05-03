@@ -18,6 +18,18 @@
 		<div class="text-left">
 			<span>Texts Per Order: <strong><%= dashboardData['textsPerOrderAll'].toFixed(2) %> (~$ <%= (dashboardData['textsPerOrderAll']*0.0075).toFixed(2) %>)</strong></span>
 		</div>
+		<div class="text-left">
+			<span>Total Texts: <strong><%= dashboardData['totalTexts'] %></strong></span>
+		</div>
+		<div class="text-left">
+			<span style='color:#27c431;'>Total Positive Texts: <strong><%= dashboardData['positiveTexts'] %> (<%= ((dashboardData['positiveTexts']/dashboardData['totalTexts'])*100).toFixed(2) %>%)</strong></span>
+		</div>
+		<div class="text-left">
+			<span style='color:#c62825;'>Total Negative Texts: <strong><%= dashboardData['negativeTexts'] %> (<%= ((dashboardData['negativeTexts']/dashboardData['totalTexts'])*100).toFixed(2) %>%)</strong></span>
+		</div>
+		<div class="text-left">
+			<span>Total Neutral Texts: <strong><%= dashboardData['neutralTexts'] %> (<%= ((dashboardData['neutralTexts']/dashboardData['totalTexts'])*100).toFixed(2) %>%)</strong></span>
+		</div>
 
 		<h3 class="text-left">This Month</h3>
 		<div class="text-left">
