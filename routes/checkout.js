@@ -375,7 +375,7 @@ router.post("/cart/web-charge", function(req,res){
                                     //ERROR
                                 } else {
                                     if(order){
-                                        var number = parseInt(order.invoiceNumber.substr(4))+1;
+                                        var number = parseInt(order.invoiceNumber.substr(3))+1;
                                         var newOrder = 'SAN'+number.toString();
                                     } else {
                                         var newOrder = 'SAN1000';
@@ -547,7 +547,7 @@ router.post("/cart/web-charge", function(req,res){
                                     res.send({result:'error', error:'Something went wrong. Please refresh the page and try again.'});
                                 } else{
                                     if(order){
-                                        var number = parseInt(order.invoiceNumber.substr(4))+1;
+                                        var number = parseInt(order.invoiceNumber.substr(3))+1;
                                         var newOrder = 'SAN'+number.toString();
                                     } else{
                                         var newOrder = 'SAN1000';
@@ -703,7 +703,7 @@ router.post("/cart/web-charge", function(req,res){
                                 res.send({result:'error', error:'Something went wrong. Please refresh the page and try again.'});
                             } else{
                                 if(order){
-                                    var number = parseInt(order.invoiceNumber.substr(4))+1;
+                                    var number = parseInt(order.invoiceNumber.substr(3))+1;
                                     var newOrder = 'SAN'+number.toString();
                                 } else{
                                     var newOrder = 'SAN1000';
@@ -919,7 +919,7 @@ router.post("/reorder", function(req,res){
                           //ERROR
                       } else {
                           if(order){
-                              var number = parseInt(order.invoiceNumber.substr(4))+1;
+                              var number = parseInt(order.invoiceNumber.substr(3))+1;
                               var newOrder = 'SAN'+number.toString();
                           } else {
                               var newOrder = 'SAN1000';
