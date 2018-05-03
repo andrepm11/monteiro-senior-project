@@ -17,7 +17,7 @@
             <tbody>
                 <% found.forEach(function(customer){ %>
                     <tr>
-                        <td><a href="/textCustomers/<%= customer.phone %>"><%= customer.phone %></a></td>
+                        <td><a href="/crm?phone=<%= customer.phone %>"><%= customer.phone %></a></td>
                         <td><%= String(customer.created).substring(4,15) %></td>
                         <td><%= customer.firstName + ' '+customer.lastName %></td>
                         <td><%= customer.email %></td>
