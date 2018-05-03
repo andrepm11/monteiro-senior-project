@@ -95,7 +95,7 @@
 
     	if(data.sentiment == 'positive'){
 			html+='<div class="text-bubble '+data.sender+'-text" style="background-color:#27c431;">'+data.message+'</div><div class="collapse '+data.sender+'-timestamp text-muted">'+data.timestamp+'</div></div></div>';
-		} else if(message.sentiment == 'negative'){
+		} else if(data.sentiment == 'negative'){
 			html+='<div class="text-bubble '+data.sender+'-text" style="background-color:#c62825;">'+data.message+'</div><div class="collapse '+data.sender+'-timestamp text-muted">'+data.timestamp+'</div></div></div>';
 		} else {
 			html+='<div class="text-bubble '+data.sender+'-text">'+data.message+'</div><div class="collapse '+data.sender+'-timestamp text-muted">'+data.timestamp+'</div></div></div>';
@@ -112,7 +112,7 @@
     	$('#conversation-list').prepend(chatPreview);
 
     	$('.chat-preview').off('click');
-    	// bindChatPreview();
+    	bindChatPreview();
 
 
     	if(data.phone == $('#active-phone').data('phone')){
