@@ -87,13 +87,13 @@ router.post("/twilio", function(req,res){
 				var time = new Date();
 				if(found){
 
-					console.log(sentiment(req.body.Body));
 
 					found.chat.push({
 						message : req.body.Body,
 						sender : 'Customer',
 						timestamp : time,
-						status : 'unread'
+						status : 'unread',
+						sentiment : sentiment(req.body.Body).vote
 					});
 					found.lastInteraction = time;
 					found.waitingOnResponse = true;
@@ -114,7 +114,6 @@ router.post("/twilio", function(req,res){
 					
 
 				} else{
-					console.log(sentiment(req.body.Body));
 
 					var firstReply = 'Thanks for texting! You can order by checking out online at monteiro-senior-project.herokuapp.com. Let me know if you have any questions!';
 
@@ -127,7 +126,8 @@ router.post("/twilio", function(req,res){
 								message : req.body.Body,
 								sender : 'Customer',
 								timestamp : new Date(),
-								status : 'unread'
+								status : 'unread',
+								sentiment : sentiment(req.body.Body).vote
 							}
 						],
 						totalOrders : 0,
