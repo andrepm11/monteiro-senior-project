@@ -108,6 +108,7 @@ router.post("/twilio", function(req,res){
 					data.timestamp = time;
                     data.firstName = found.firstName;
                     data.lastName = found.lastName;
+                    data.sentiment = sentiment(req.body.Body).vote;
                     io.emit('chat message', data);
 
 

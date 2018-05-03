@@ -91,7 +91,16 @@
     });
     socket.on('chat message', function(data){
 
-    	var html = '<div class="row ml-0 mr-0"><div class="col-12 message-timestamp mt-3 mb-3 text-center text-muted"></div><div class="col-12" data-timestamp="'+data.timestamp+'"><div class="text-bubble '+data.sender+'-text">'+data.message+'</div><div class="collapse '+data.sender+'-timestamp text-muted">'+data.timestamp+'</div></div></div>';
+    	var html = '<div class="row ml-0 mr-0"><div class="col-12 message-timestamp mt-3 mb-3 text-center text-muted"></div><div class="col-12" data-timestamp="'+data.timestamp+'">';
+
+    	if(data.sentiment == 'positive'){
+			html+='<div class="text-bubble '+data.sender+'-text" style="background-color:#27c431;">'+data.message+'</div><div class="collapse '+data.sender+'-timestamp text-muted">'+data.timestamp+'</div></div></div>';
+		} else if(message.sentiment == 'negative'){
+			html+='<div class="text-bubble '+data.sender+'-text" style="background-color:#c62825;">'+data.message+'</div><div class="collapse '+data.sender+'-timestamp text-muted">'+data.timestamp+'</div></div></div>';
+		} else {
+			html+='<div class="text-bubble '+data.sender+'-text">'+data.message+'</div><div class="collapse '+data.sender+'-timestamp text-muted">'+data.timestamp+'</div></div></div>';
+		}
+    	
 
 
     	if($('#'+data.phone).hasClass('active-preview')){
